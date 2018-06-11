@@ -10,3 +10,6 @@ Standalone Service that provides reports as IFrame components
 3. AUTH_URL
 4. AUTH_CLIENT_ID
 5. SESSION_SECRET
+
+
+(c) Crown Copyright 2018 - MIT License
