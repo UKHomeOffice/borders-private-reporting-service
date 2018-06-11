@@ -1,5 +1,5 @@
 import responseHandler from "../utilities/handlers/responseHandler";
-import path from 'path';
+import * as logger from 'winston';
 
 class ReportingController {
     constructor(reportingService, config) {
@@ -15,7 +15,9 @@ class ReportingController {
     }
 
     async listReports(req, res) {
-        const baseUrl = `${req.protocol}://${req.get('host')}/api/reports/`;
+        const hostname = req.headers.host;
+        const baseUrl = `${req.protocol}://${hostname}/api/reports/`;
+        logger.info(`base url ${baseUrl}`);
         const listOfReports = await this.reportingService.reports(baseUrl);
         responseHandler.res(null, listOfReports, res);
     };
