@@ -10,7 +10,8 @@ import httpMocks from 'node-mocks-http';
 
 const testConfig = () => {
     return {
-        reportsDir: path.join(__dirname, '../reports')
+        reportsDir: path.join(__dirname, '../reports'),
+        baseUrl: `localhost:8000`
     }
 };
 
@@ -23,6 +24,7 @@ describe('Reporting Controller', () => {
         const request = httpMocks.createRequest({
             method: 'GET',
             url: '/api/reports',
+            protocol: 'http'
         });
         const response = httpMocks.createResponse({
             eventEmitter: require('events').EventEmitter

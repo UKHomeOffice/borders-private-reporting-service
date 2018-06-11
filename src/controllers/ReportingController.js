@@ -15,8 +15,7 @@ class ReportingController {
     }
 
     async listReports(req, res) {
-        const hostname = req.headers.host;
-        const baseUrl = `${req.protocol}://${hostname}/api/reports/`;
+        const baseUrl = `${req.protocol}://${this.config.baseUrl}/api/reports/`;
         logger.info(`base url ${baseUrl}`);
         const listOfReports = await this.reportingService.reports(baseUrl);
         responseHandler.res(null, listOfReports, res);
