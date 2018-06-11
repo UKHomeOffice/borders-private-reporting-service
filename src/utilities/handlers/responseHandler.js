@@ -1,4 +1,4 @@
-const healthRes = (err, data, res) => {
+const res = (err, data, res) => {
     if (err) {
         return res.status(err.code).json(err.message);
     }
@@ -6,5 +6,5 @@ const healthRes = (err, data, res) => {
 };
 
 export default {
-    healthRes
+    res
 };
