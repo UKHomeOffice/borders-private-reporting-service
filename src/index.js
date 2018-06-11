@@ -69,7 +69,7 @@ app.set('port', port);
 
 const memoryStore = new session.MemoryStore();
 const keycloak = new Keycloak({store: memoryStore}, kcConfig);
-const platformDataUrl = process.env.PLATFORM_DATA_URL;
+const platformDataProxyUrl = process.env.PLATFORM_DATA_PROXY_URL;
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -98,12 +98,9 @@ app.use('/public', express.static(path.join(__dirname, '../public')));
 
 app.use('/api/platform-data', proxy(
     {
-        target: platformDataUrl,
-        pathRewrite: {
-            '^/api/platform-data/': ''
-        },
+        target: platformDataProxyUrl,
         onProxyReq: function onProxyReq(proxyReq, req, res) {
-            console.log('Platform Data Proxy -->  ', req.method, req.path, '-->', platformDataUrl, proxyReq.path);
+            console.log('Platform Data Proxy -->  ', req.method, req.path, '-->', platformDataProxyUrl, proxyReq.path);
         },
         onError: function onError(err, req, res) {
             console.error(err);
