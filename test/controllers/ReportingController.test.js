@@ -4,6 +4,7 @@ import path from 'path';
 import expect from 'expect';
 
 process.env.WHITE_LISTED_DOMAIN = 'http://localhost:8000';
+process.env.PLATFORM_DATA_URL = 'http://localhost:9000';
 
 import httpMocks from 'node-mocks-http';
 
