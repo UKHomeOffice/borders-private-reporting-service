@@ -87,6 +87,8 @@ app.use(helmet());
 app.use(keycloak.middleware());
 app.disable('x-powered-by');
 
+app.enable('trust proxy');
+
 app.use(frameguard({
     action: 'allow-from',
     domain: process.env.WHITE_LISTED_DOMAIN
