@@ -14,3 +14,4 @@ Standalone Service that provides reports as IFrame components
 7. WHITE_LISTED_DOMAIN
 
 (c) Crown Copyright 2018 - MIT License
+
