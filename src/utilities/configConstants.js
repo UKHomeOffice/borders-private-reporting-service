@@ -8,7 +8,8 @@ const baseUrl = process.env.NODE_ENV === 'production' ? `${process.env.REPORTING
 const configConstants = () => {
     return {
         reportsDir: "/workflow-resources/reports",
-        baseUrl: baseUrl
+        baseUrl: baseUrl,
+        platformDataProxyUrl: process.env.PLATFORM_DATA_PROXY_URL
     }
 };
 
