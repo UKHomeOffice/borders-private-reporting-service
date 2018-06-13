@@ -126,7 +126,7 @@ describe('Reporting Controller', () => {
             expect(response.statusCode).toEqual(200);
             expect(response._isEndCalled()).toBe(true);
             const data = JSON.parse(response._getData());
-            expect(data.length).toBe(1);
+            expect(data.length).toBeGreaterThanOrEqual(1);
             done();
         });
     })

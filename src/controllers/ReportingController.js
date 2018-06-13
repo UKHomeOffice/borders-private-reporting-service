@@ -16,13 +16,9 @@ class ReportingController {
         const currentUser = await this.platformDataService.currentUserShift(email);
 
         if (!currentUser) {
-            logger.warn(`Current user ${email} not authorized to make this request`);
-            responseHandler.res({
-                code: 404,
-                message: 'Current user not authorized to view reports. No shift information available'
-            }, null, res);
+            this.unauthorizedResponse(email, res);
         } else {
-            const report = await this.reportingService.report(reportName,  currentUser);
+            const report = await this.reportingService.report(reportName, currentUser);
             if (report) {
                 res.sendFile(`${this.config.reportsDir}/${reportName}`);
             } else {
@@ -34,16 +30,20 @@ class ReportingController {
         }
     }
 
+    unauthorizedResponse(email, res) {
+        logger.warn(`Current user ${email} not authorized to make this request`);
+        responseHandler.res({
+            code: 404,
+            message: 'Current user not authorized to view reports. No shift information available'
+        }, null, res);
+    }
+
     async listReports(req, res) {
         const baseUrl = `${req.protocol}://${this.config.baseUrl}/api/reports/`;
         const email = req.kauth.grant.access_token.content.email;
         const currentUser = await this.platformDataService.currentUserShift(email);
         if (!currentUser) {
-            logger.warn(`Current user ${email} not authorized to make this request`);
-            responseHandler.res({
-                code: 404,
-                message: 'Current user not authorized to view reports. No shift information available'
-            }, null, res);
+            this.unauthorizedResponse(email, res);
         } else {
             const listOfReports = await this.reportingService.reports(currentUser);
             const data = listOfReports.filter(x => x)

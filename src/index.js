@@ -111,7 +111,7 @@ app.use('/api/platform-data', proxy(
         },
         logLevel: 'debug',
         changeOrigin: true,
-        secure: false
+        secure: true
     }
 ));
 
