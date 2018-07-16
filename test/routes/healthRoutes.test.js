@@ -15,7 +15,7 @@ chai.use(chaiHttp);
 
 describe('Health Routes', () => {
     describe('/GET healthz', () => {
-        it('it should return a boyd of {status:OK}', (done) => {
+        it('it should return a body of {status:OK}', (done) => {
             chai.request(server)
                 .get('/api/reports/healthz')
                 .end((err, res) => {
