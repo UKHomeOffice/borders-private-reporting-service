@@ -7,9 +7,12 @@ import cheerio from "cheerio";
 describe('Authorization Checker', () => {
     const authorizationChecker = new AuthorizationChecker();
     const currentUser = {
-        "teamid" : "teamid"
+        "teamid" : "teamid",
+        "commandid" : "commandid",
+        "subcommandid": "subcommandid",
+        "locationid" : "locationid"
     };
-    it('is authorised', () => {
+    it('is authorised by team id', () => {
         const file =  fs.readFileSync(path.join(__dirname, '../reports/test-report.html'), 'utf8');
         const html = cheerio.load(file);
         const authorized = authorizationChecker.isAuthorized(currentUser, html);
@@ -23,6 +26,24 @@ describe('Authorization Checker', () => {
     });
     it('is authorized to see as no restrictions defined', () => {
         const file =  fs.readFileSync(path.join(__dirname, '../reports/test-report-3.html'), 'utf8');
+        const html = cheerio.load(file);
+        const authorized = authorizationChecker.isAuthorized(currentUser, html);
+        expect(authorized).toEqual(true);
+    });
+    it ('displays report if matched on commandid', () => {
+        const file =  fs.readFileSync(path.join(__dirname, '../reports/test-report-commandid.html'), 'utf8');
+        const html = cheerio.load(file);
+        const authorized = authorizationChecker.isAuthorized(currentUser, html);
+        expect(authorized).toEqual(true);
+    });
+    it ('displays report if matched on subcommandid', () => {
+        const file =  fs.readFileSync(path.join(__dirname, '../reports/test-report-subcommandid.html'), 'utf8');
+        const html = cheerio.load(file);
+        const authorized = authorizationChecker.isAuthorized(currentUser, html);
+        expect(authorized).toEqual(true);
+    });
+    it ('displays report if matched on locationid', () => {
+        const file =  fs.readFileSync(path.join(__dirname, '../reports/test-report-locationid.html'), 'utf8');
         const html = cheerio.load(file);
         const authorized = authorizationChecker.isAuthorized(currentUser, html);
         expect(authorized).toEqual(true);

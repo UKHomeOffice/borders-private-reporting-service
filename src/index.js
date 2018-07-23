@@ -112,7 +112,7 @@ app.use('/api/platform-data', proxy(
         logLevel: 'debug',
         changeOrigin: true,
         secure: process.env.NODE_ENV === 'production',
-        agent: process.env.NODE_ENV === 'production' ? https.globalAgent: {}
+        agent: process.env.NODE_ENV === 'production' ? https.globalAgent: null
     }
 ));
 
