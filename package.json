@@ -7,7 +7,8 @@
     "dev": "nodemon $NODE_DEBUG_OPTION -w src --exec \"babel-node src --presets env,stage-0\"",
     "build": "babel src -s -D -d dist --presets env,stage-0",
     "start": "node dist",
-    "test": "node_modules/.bin/mocha --require babel-polyfill --require babel-register --exit --recursive --timeout 5000"
+    "test": "node_modules/.bin/mocha --require babel-polyfill --require babel-register --exit --recursive --timeout 5000",
+    "coverage": "nyc --reporter=lcov mocha --require babel-polyfill --require babel-register --exit --recursive --timeout 5000"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
@@ -68,6 +69,7 @@
     "node-mocks-http": "^1.6.7",
     "nodemon": "^1.12.1",
     "proxyquire": "^2.0.1",
+    "nyc": "^12.0.2",
     "sinon": "^4.5.0"
   }
 }
