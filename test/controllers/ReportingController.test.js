@@ -164,5 +164,43 @@ describe('Reporting Controller', () => {
             done();
         });
     });
+    it('can get report', (done) => {
+        const request = httpMocks.createRequest({
+            method: 'GET',
+            url: '/api/reports',
+            params: {
+                reportName: "test-report.html"
+            },
+            protocol: 'http',
+            kauth: {
+                grant: {
+                    access_token: {
+                        token: "test-token",
+                        content: {
+                            session_state: "session_id",
+                            email: "email",
+                            preferred_username: "test",
+                            given_name: "testgivenname",
+                            family_name: "testfamilyname"
+                        }
+                    }
 
+                }
+            }
+        });
+        const shiftInfo = platformDataService.currentUserShift.resolves({"teamid": "teamid", "email": "email"});
+
+        const res = {
+            sendFile: function(fileName){
+                console.log(`Returning fileName ${fileName}`);
+                return fileName;
+            }
+        };
+        controller.getReport(request, res).then(() => {
+            sinon.assert.calledOnce(shiftInfo);
+            done();
+        });
+
+
+    });
 });
