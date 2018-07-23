@@ -131,5 +131,38 @@ describe('Reporting Controller', () => {
             expect(data.length).toBeGreaterThanOrEqual(1);
             done();
         });
-    })
+    });
+    it('throws unauthorized on get report', (done) => {
+        const request = httpMocks.createRequest({
+            method: 'GET',
+            url: '/api/reports/test-report.html',
+            protocol: 'http',
+            kauth: {
+                grant: {
+                    access_token: {
+                        token: "test-token",
+                        content: {
+                            session_state: "session_id",
+                            email: "email",
+                            preferred_username: "test",
+                            given_name: "testgivenname",
+                            family_name: "testfamilyname"
+                        }
+                    }
+
+                }
+            }
+        });
+        const response = httpMocks.createResponse({
+            eventEmitter: require('events').EventEmitter
+        });
+        const shiftInfo = platformDataService.currentUserShift.resolves(null);
+        controller.getReport(request, response);
+        response.on('end', () => {
+            sinon.assert.calledOnce(shiftInfo);
+            expect(response.statusCode).toEqual(404);
+            done();
+        });
+    });
+
 });
