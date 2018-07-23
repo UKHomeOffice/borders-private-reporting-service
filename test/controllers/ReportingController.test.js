@@ -94,6 +94,8 @@ describe('Reporting Controller', () => {
             done();
         });
     });
+
+
     it('filtered reports based on users shift info', (done) => {
         const request = httpMocks.createRequest({
             method: 'GET',
