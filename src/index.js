@@ -101,7 +101,7 @@ app.use('/public', express.static(path.join(__dirname, '../public')));
 app.use('/api/platform-data', proxy(
     {
         target: platformDataProxyUrl,
-        onProxyReq: function(proxyReq, req, res) {
+        onProxyReq: function(proxyReq, req) {
             logger.info('Platform Data Proxy -->  ', req.method, req.path, '-->', platformDataProxyUrl, proxyReq.path);
         },
         onError: function (err, req, res) {
