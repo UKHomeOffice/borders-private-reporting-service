@@ -32,7 +32,7 @@ if (process.env.NODE_ENV === 'production') {
     logger.info('ca bundle set...');
 }
 
-let kcConfig = {
+const kcConfig = {
     clientId: process.env.AUTH_CLIENT_ID,
     serverUrl: process.env.AUTH_URL,
     realm: process.env.AUTH_REALM
@@ -101,11 +101,11 @@ app.use('/public', express.static(path.join(__dirname, '../public')));
 app.use('/api/platform-data', proxy(
     {
         target: platformDataProxyUrl,
-        onProxyReq: function onProxyReq(proxyReq, req, res) {
-            console.log('Platform Data Proxy -->  ', req.method, req.path, '-->', platformDataProxyUrl, proxyReq.path);
+        onProxyReq: function(proxyReq, req, res) {
+            logger.info('Platform Data Proxy -->  ', req.method, req.path, '-->', platformDataProxyUrl, proxyReq.path);
         },
-        onError: function onError(err, req, res) {
-            console.error(err);
+        onError: function (err, req, res) {
+            logger.error(err);
             res.status(500);
             res.json({error: 'Error when connecting to remote server.'});
         },
@@ -133,14 +133,14 @@ server.on('connection', connection => {
 });
 
 function shutDown() {
-    console.log('Received kill signal, shutting down gracefully');
+    logger.info('Received kill signal, shutting down gracefully');
     server.close(() => {
-        console.log('Closed out remaining connections');
+        logger.info('Closed out remaining connections');
         process.exit(0);
     });
 
     setTimeout(() => {
-        console.error('Could not close connections in time, forcefully shutting down');
+        logger.error('Could not close connections in time, forcefully shutting down');
         process.exit(1);
     }, 10000);
 
