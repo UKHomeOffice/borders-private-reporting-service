@@ -11,7 +11,7 @@ class PlatformDataService {
     async currentUserShift(email) {
         try {
             const response = await axios({
-                url: `${this.config.platformDataProxyUrl}/api/platform-data/shift?email=eq.${email}`,
+                url: `${this.config.platformDataProxyUrl}/api/platform-data/shift?email=eq.${encodeURIComponent(email)}`,
                 method: 'GET',
                 headers: {
                     'Content-Type' : 'application/json'
