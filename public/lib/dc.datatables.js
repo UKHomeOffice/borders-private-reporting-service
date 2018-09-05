@@ -63,6 +63,7 @@ dc_datatables.datatable = function(selector, chartGroup) {
             .append('table')
             .merge(table);
         _dt = $(table.node()).DataTable({
+            responsive: true,
             columns: _table.columns().map(function(c) {
                 var col = {
                     name: typeof c === 'string' ? c : c.label,
