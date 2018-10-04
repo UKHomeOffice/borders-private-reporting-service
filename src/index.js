@@ -89,11 +89,6 @@ app.disable('x-powered-by');
 
 app.enable('trust proxy');
 
-app.use(frameguard({
-    action: 'allow-from',
-    domain: process.env.WHITE_LISTED_DOMAIN
-}));
-
 app.use('/api/reports', route.allRoutes(keycloak));
 
 app.use('/public', express.static(path.join(__dirname, '../public')));
