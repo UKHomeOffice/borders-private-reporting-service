@@ -91,7 +91,7 @@ app.enable('trust proxy');
 
 app.use('/api/reports', route.allRoutes(keycloak));
 
-app.use('/public', express.static(path.join(__dirname, '../public')));
+app.use('/reportspublic', express.static(path.join(__dirname, '../reportspublic')));
 
 app.use('/api/platform-data', proxy(
     {
