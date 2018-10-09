@@ -39,20 +39,13 @@ class ReportingController {
     }
 
     async listReports(req, res) {
-        const baseUrl = `${req.protocol}://${this.config.baseUrl}/api/reports/`;
         const email = req.kauth.grant.access_token.content.email;
         const currentUser = await this.platformDataService.currentUserShift(email);
         if (!currentUser) {
             this.unauthorizedResponse(email, res);
         } else {
             const listOfReports = await this.reportingService.reports(currentUser);
-            const data = listOfReports.filter(x => x)
-                .map((report) => {
-                    const fileName = report.htmlName;
-                    report.url = baseUrl + fileName;
-                    return report;
-                });
-            responseHandler.res(null, data, res);
+            responseHandler.res(null, listOfReports, res);
         }
     };
 

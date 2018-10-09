@@ -16,7 +16,7 @@ class ReportService {
 
 
     async report(reportName, currentUser) {
-        const fileName = `${this.config.reportsDir}/${reportName}`
+        const fileName = `${this.config.reportsDir}/${reportName}`;
         const fileContent = await readFile(fileName, 'utf8');
         const html = cheerio.load(fileContent);
         if (this.authorizationChecker.isAuthorized(currentUser, html)) {
