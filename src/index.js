@@ -67,15 +67,17 @@ const port = process.env.PORT || 8080;
 
 app.set('port', port);
 
-const memoryStore = new session.MemoryStore();
-const keycloak = new Keycloak({store: memoryStore}, kcConfig);
+const cookieStore = new session.Cookie({
+    secure: true
+});
+const keycloak = new Keycloak({store: cookieStore}, kcConfig);
 const platformDataProxyUrl = process.env.PLATFORM_DATA_PROXY_URL;
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    store: memoryStore,
+    store: cookieStore,
     name: process.env.SESSION_NAME
 }));
 
