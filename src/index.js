@@ -67,19 +67,9 @@ const port = process.env.PORT || 8080;
 
 app.set('port', port);
 
-const cookieStore = new session.Cookie({
-    secure: true
-});
-const keycloak = new Keycloak({store: cookieStore}, kcConfig);
+const keycloak = new Keycloak({}, kcConfig);
 const platformDataProxyUrl = process.env.PLATFORM_DATA_PROXY_URL;
 
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: cookieStore,
-    name: process.env.SESSION_NAME
-}));
 
 app.use(bodyParser.json());
 app.use(morgan('common'));
