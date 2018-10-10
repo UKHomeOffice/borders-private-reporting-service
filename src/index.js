@@ -35,8 +35,7 @@ if (process.env.NODE_ENV === 'production') {
 const kcConfig = {
     clientId: process.env.AUTH_CLIENT_ID,
     serverUrl: process.env.AUTH_URL,
-    realm: process.env.AUTH_REALM,
-    bearerOnly: true
+    realm: process.env.AUTH_REALM
 };
 
 axios.interceptors.request.use(
