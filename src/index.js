@@ -19,6 +19,12 @@ import moment from 'moment';
 import helmet from 'helmet';
 import frameguard from 'frameguard';
 
+const app = express();
+
+const port = process.env.PORT || 8080;
+
+app.set('port', port);
+
 if (process.env.NODE_ENV === 'production') {
     logger.info('Setting ca bundle');
     const trustedCa = [
@@ -30,6 +36,12 @@ if (process.env.NODE_ENV === 'production') {
         https.globalAgent.options.ca.push(fs.readFileSync(ca));
     }
     logger.info('ca bundle set...');
+} else {
+    logger.info('in local dev mode');
+    app.use(frameguard({
+        action: 'allow-from',
+        domain: process.env.WHITE_LISTED_DOMAIN
+    }));
 }
 
 const kcConfig = {
@@ -61,14 +73,19 @@ axios.interceptors.response.use((response) => {
 });
 
 
-const app = express();
 
-const port = process.env.PORT || 8080;
+const memoryStore = new session.MemoryStore();
+const keycloak = new Keycloak({store: memoryStore}, kcConfig);
 
-app.set('port', port);
-
-const keycloak = new Keycloak({}, kcConfig);
 const platformDataProxyUrl = process.env.PLATFORM_DATA_PROXY_URL;
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    store: memoryStore,
+    name: process.env.SESSION_NAME
+}));
 
 
 app.use(bodyParser.json());
