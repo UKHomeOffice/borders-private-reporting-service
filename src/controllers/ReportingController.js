@@ -12,8 +12,10 @@ class ReportingController {
 
     async getReport(req, res) {
         const {reportName} = req.params;
+        const token = req.kauth.grant.access_token.token;
+
         const email = req.kauth.grant.access_token.content.email;
-        const currentUser = await this.platformDataService.currentUserShift(email);
+        const currentUser = await this.platformDataService.currentUserShift(email, token);
 
         if (!currentUser) {
             this.unauthorizedResponse(email, res);
@@ -40,7 +42,8 @@ class ReportingController {
 
     async listReports(req, res) {
         const email = req.kauth.grant.access_token.content.email;
-        const currentUser = await this.platformDataService.currentUserShift(email);
+        const token = req.kauth.grant.access_token.token;
+        const currentUser = await this.platformDataService.currentUserShift(email, token);
         if (!currentUser) {
             this.unauthorizedResponse(email, res);
         } else {

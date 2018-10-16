@@ -8,13 +8,14 @@ class PlatformDataService {
         this.currentUserShift = this.currentUserShift.bind(this);
     }
 
-    async currentUserShift(email) {
+    async currentUserShift(email, token) {
         try {
             const response = await axios({
                 url: `${this.config.platformDataProxyUrl}/api/platform-data/shift?email=eq.${encodeURIComponent(email)}`,
                 method: 'GET',
                 headers: {
-                    'Content-Type' : 'application/json'
+                    'Content-Type' : 'application/json',
+                    'Authorization' : `Bearer ${token}`
                 }
             });
             const shiftDetails = response.data ? response.data[0] : null;
