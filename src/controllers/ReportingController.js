@@ -22,7 +22,13 @@ class ReportingController {
         } else {
             const report = await this.reportingService.report(reportName, currentUser);
             if (report) {
-                res.sendFile(`${this.config.reportsDir}/${reportName}`);
+                const options = {
+                    headers: {
+                        'access_token': token
+                    }
+                };
+                console.log(JSON.stringify(options));
+                res.sendFile(`${this.config.reportsDir}/${reportName}`, options);
             } else {
                 responseHandler.res({
                     code: 401,
