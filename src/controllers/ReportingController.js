@@ -27,7 +27,6 @@ class ReportingController {
                         'access_token': token
                     }
                 };
-                console.log(JSON.stringify(options));
                 res.sendFile(`${this.config.reportsDir}/${reportName}`, options);
             } else {
                 responseHandler.res({
