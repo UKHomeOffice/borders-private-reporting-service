@@ -29,16 +29,7 @@ const redisUrl = process.env.PRIVATE_REDIS_URL || 'localhost';
 const redisPort = process.env.PRIVATE_REDIS_PORT || 6379;
 const redisAuthToken = process.env.PRIVATE_REDIS_TOKEN || '';
 
-let client = redis.createClient(
-    redisUrl,
-    redisPort, {
-        no_ready_check: true,
-        password: redisAuthToken,
-        tls: {
-            servername: redisUrl
-        }
-    }
-);
+let redisClient;
 
 
 const app = express();
@@ -48,6 +39,16 @@ const port = process.env.PORT || 8080;
 app.set('port', port);
 
 if (process.env.NODE_ENV === 'production') {
+    redisClient = redis.createClient({
+            host: redisUrl,
+            port: redisPort,
+            no_ready_check: true,
+            auth_pass: redisAuthToken,
+            tls: {
+                servername: redisUrl
+            }
+        }
+    );
     logger.info('Setting ca bundle');
     const trustedCa = [
         '/etc/ssl/certs/ca-bundle.crt'
@@ -59,6 +60,13 @@ if (process.env.NODE_ENV === 'production') {
     }
     logger.info('ca bundle set...');
 } else {
+    redisClient = redis.createClient({
+            host: redisUrl,
+            port: redisPort,
+            no_ready_check: true,
+            auth_pass: redisAuthToken
+        }
+    );
     logger.info('in local dev mode');
     app.use(frameguard({
         action: 'allow-from',
@@ -95,9 +103,7 @@ axios.interceptors.response.use((response) => {
 });
 
 
-const redisStore = new RedisStore({client: client});
-
-
+const redisStore = new RedisStore({client: redisClient});
 
 const platformDataProxyUrl = process.env.PLATFORM_DATA_PROXY_URL;
 
