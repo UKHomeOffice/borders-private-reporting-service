@@ -31,6 +31,7 @@
     "babel-register": "^6.26.0",
     "body-parser": "^1.18.2",
     "btoa": "^1.2.1",
+    "cached-path-relative": "^1.0.2",
     "cheerio": "^1.0.0-rc.2",
     "connect-redis": "^3.4.0",
     "cookie-parser": "^1.4.3",
