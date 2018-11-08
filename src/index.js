@@ -25,21 +25,18 @@ import session from "express-session";
 const RedisStore = require('connect-redis')(session);
 
 
-const redisUrl = process.env.PRIVATE_REDIS_URL || 'localhost';
-const redisPort = process.env.PRIVATE_REDIS_PORT || 6379;
-const redisAuthToken = process.env.PRIVATE_REDIS_TOKEN || '';
-
-let redisClient;
-
-
 const app = express();
 
 const port = process.env.PORT || 8080;
 
 app.set('port', port);
+let sessionStore;
 
 if (process.env.NODE_ENV === 'production') {
-    redisClient = redis.createClient({
+    const redisUrl = process.env.PRIVATE_REDIS_URL || 'localhost';
+    const redisPort = process.env.PRIVATE_REDIS_PORT || 6379;
+    const redisAuthToken = process.env.PRIVATE_REDIS_TOKEN || '';
+    const redisClient = redis.createClient({
             host: redisUrl,
             port: redisPort,
             no_ready_check: true,
@@ -50,6 +47,7 @@ if (process.env.NODE_ENV === 'production') {
 
         }
     );
+    sessionStore = new RedisStore({client: redisClient});
     logger.info('Setting ca bundle');
     const trustedCa = [
         '/etc/ssl/certs/ca-bundle.crt'
@@ -61,13 +59,7 @@ if (process.env.NODE_ENV === 'production') {
     }
     logger.info('ca bundle set...');
 } else {
-    redisClient = redis.createClient({
-            host: redisUrl,
-            port: redisPort,
-            no_ready_check: true,
-            auth_pass: redisAuthToken
-        }
-    );
+    sessionStore = new session.MemoryStore();
     logger.info('in local dev mode');
     app.use(frameguard({
         action: 'allow-from',
@@ -104,18 +96,16 @@ axios.interceptors.response.use((response) => {
 });
 
 
-const redisStore = new RedisStore({client: redisClient});
-
 const platformDataProxyUrl = process.env.PLATFORM_DATA_PROXY_URL;
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    store: redisStore,
+    store: sessionStore,
     name: process.env.SESSION_NAME
 }));
-const keycloak = new Keycloak({store: redisStore}, kcConfig);
+const keycloak = new Keycloak({store: sessionStore}, kcConfig);
 
 
 app.use(bodyParser.json());
