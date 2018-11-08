@@ -47,6 +47,7 @@ if (process.env.NODE_ENV === 'production') {
             tls: {
                 servername: redisUrl
             }
+
         }
     );
     logger.info('Setting ca bundle');
