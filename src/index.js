@@ -12,12 +12,34 @@ import fs from 'fs';
 import path from 'path';
 import proxy from 'http-proxy-middleware';
 
-import session from 'express-session';
 import Keycloak from 'keycloak-connect';
 import * as axios from "axios";
 import moment from 'moment';
 import helmet from 'helmet';
 import frameguard from 'frameguard';
+
+
+import redis from "redis";
+import session from "express-session";
+
+const RedisStore = require('connect-redis')(session);
+
+
+const redisUrl = process.env.PRIVATE_REDIS_URL || 'localhost';
+const redisPort = process.env.PRIVATE_REDIS_PORT || 6379;
+const redisAuthToken = process.env.PRIVATE_REDIS_TOKEN || '';
+
+let client = redis.createClient(
+    redisUrl,
+    redisPort, {
+        no_ready_check: true,
+        password: redisAuthToken,
+        tls: {
+            servername: redisUrl
+        }
+    }
+);
+
 
 const app = express();
 
@@ -73,9 +95,9 @@ axios.interceptors.response.use((response) => {
 });
 
 
+const redisStore = new RedisStore({client: client});
 
-const memoryStore = new session.MemoryStore();
-const keycloak = new Keycloak({store: memoryStore}, kcConfig);
+
 
 const platformDataProxyUrl = process.env.PLATFORM_DATA_PROXY_URL;
 
@@ -83,9 +105,10 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    store: memoryStore,
+    store: redisStore,
     name: process.env.SESSION_NAME
 }));
+const keycloak = new Keycloak({store: redisStore}, kcConfig);
 
 
 app.use(bodyParser.json());
