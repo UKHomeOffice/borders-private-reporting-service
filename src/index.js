@@ -48,6 +48,7 @@ if (process.env.NODE_ENV === 'production') {
         }
     );
     sessionStore = new RedisStore({client: redisClient});
+    logger.info("Session store ...redisStore...");
     logger.info('Setting ca bundle');
     const trustedCa = [
         '/etc/ssl/certs/ca-bundle.crt'
