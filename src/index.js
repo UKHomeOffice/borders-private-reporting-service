@@ -24,7 +24,6 @@ import session from "express-session";
 
 const RedisStore = require('connect-redis')(session);
 
-
 const app = express();
 
 const port = process.env.PORT || 8080;
@@ -108,7 +107,7 @@ app.use(session({
 }));
 const keycloak = new Keycloak({store: sessionStore}, kcConfig);
 
-
+app.use(helmet.noCache());
 app.use(bodyParser.json());
 app.use(morgan('common'));
 app.use(bodyParser.urlencoded({extended: false}));
