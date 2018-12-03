@@ -1,6 +1,6 @@
 workspace:
   base: /build
-  path: src/github.com/ukhomeoffice/cop-private-reporting-service
+  path: src/github.com/ukhomeoffice/cop-private-reporting-service1
 
 pipeline:
   test:
