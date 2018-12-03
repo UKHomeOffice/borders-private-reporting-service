@@ -1,12 +1,11 @@
 workspace:
   base: /build
-  path: src/github.com/ukhomeoffice/cop-private-reporting-service
+  path: src/github.com/ukhomeoffice/cop-private-reporting-service1
 
 pipeline:
   test:
       image: node:8
       commands:
-        - rm -rf node_modules
         - npm install
         - npm run coverage
       when:
