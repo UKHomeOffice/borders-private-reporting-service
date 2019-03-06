@@ -48,4 +48,52 @@ describe('Authorization Checker', () => {
         const authorized = authorizationChecker.isAuthorized(currentUser, html);
         expect(authorized).toEqual(true);
     });
+    it ('is authorised by team code', () => {
+        const teamUser = {
+            "teamid" : "12345"
+        };
+        const teams = [
+            {
+                teamid : "12345",
+                teamcode : "OSCT"
+            },
+            {
+                teamid : "67890",
+                teamcode : "COP_ADMIN"
+            },
+            {
+                teamid : "54321",
+                teamcode : "HOB"
+            },
+
+        ]
+        const file =  fs.readFileSync(path.join(__dirname, '../reports/test-report-4.html'), 'utf8');
+        const html = cheerio.load(file);
+
+        const authorized = authorizationChecker.isAuthorized(teamUser, html, teams);
+        expect(authorized).toEqual(true);
+
+    })
+    it ('is not authorised by team code', () => {
+        const teamUser = {
+            "teamid" : "12345"
+        };
+        const teams = [
+            {
+                teamid : "67890",
+                teamcode : "COP"
+            }
+        ]
+        const file =  fs.readFileSync(path.join(__dirname, '../reports/test-report-4.html'), 'utf8');
+        const html = cheerio.load(file);
+
+        let authorized = authorizationChecker.isAuthorized(teamUser, html, teams);
+        expect(authorized).toEqual(false);
+
+        authorized = authorizationChecker.isAuthorized(teamUser, html, []);
+        expect(authorized).toEqual(false);
+
+    })
+
+
 });

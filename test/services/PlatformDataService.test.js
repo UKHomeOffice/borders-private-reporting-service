@@ -6,9 +6,9 @@ import expect from "expect";
 import configConstants from "../../src/utilities/configConstants";
 
 
-describe('PlatformDataService', () => {
+describe.only('PlatformDataService', () => {
 
-    const platfromDataService = new PlatformDataService(configConstants());
+    const platformDataService = new PlatformDataService(configConstants());
 
     it('can get shift details', (done) => {
         nock('http://localhost:9001/', {
@@ -22,7 +22,7 @@ describe('PlatformDataService', () => {
                 }
             ]);
 
-        platfromDataService.currentUserShift("email").then((shift) =>{
+        platformDataService.currentUserShift("email").then((shift) =>{
             expect(shift.shiftid).toEqual("shiftid");
             expect(shift.email).toEqual("email");
             done();
@@ -36,7 +36,7 @@ describe('PlatformDataService', () => {
         }).log(console.log)
             .get('/api/platform-data/shift?email=eq.email')
             .reply(504, []);
-        platfromDataService.currentUserShift("email").then((shift) => {
+        platformDataService.currentUserShift("email").then((shift) => {
             expect(shift).toEqual(null);
             done();
         }).catch((err) => {
@@ -49,8 +49,56 @@ describe('PlatformDataService', () => {
         }).log(console.log)
             .get('/api/platform-data/shift?email=eq.email')
             .reply(200, []);
-        platfromDataService.currentUserShift("email").then((shift) => {
+        platformDataService.currentUserShift("email").then((shift) => {
             expect(shift).toEqual(undefined);
+            done();
+        }).catch((err) => {
+            done(err);
+        });
+    });
+    it ('can get team details', () => {
+        nock('http://localhost:9001/', {
+            'Authorization': 'Bearer token'
+        }).log(console.log)
+            .get('/api/platform-data/team')
+            .reply(200, [
+                {
+                    teamid: 'teamid',
+                    teamcode: 'teamcode'
+                }
+            ]);
+
+            platformDataService.getTeams("token").then((teams) =>{
+            expect(teams.length).to.equal(1);
+            expect(teams[0]['teamcode']).to.equal("teamcode");
+            expect(teams[0]['teamid']).to.equal("teamid");
+            done();
+        }).catch((err) => {
+            done(err);
+        });
+    })
+
+    it('does not return teams if REST endpoint returns error', (done) => {
+        nock('http://localhost:9001/', {
+            'Authorization': 'Bearer token'
+        }).log(console.log)
+            .get('/api/platform-data/team')
+            .reply(504, []);
+        platformDataService.getTeams("token").then((teams) => {
+            expect(teams).toEqual(null);
+            done();
+        }).catch((err) => {
+            done(err);
+        });
+    });
+    it('does not return teams if REST endpoint returns empty', (done) => {
+        nock('http://localhost:9001/', {
+            'Authorization': 'Bearer token'
+        }).log(console.log)
+            .get('/api/platform-data/team')
+            .reply(200, []);
+        platformDataService.getTeams("token").then((teams) => {
+            expect(teams).toEqual([]);
             done();
         }).catch((err) => {
             done(err);

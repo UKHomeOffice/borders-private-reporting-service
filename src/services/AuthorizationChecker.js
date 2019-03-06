@@ -3,8 +3,9 @@ class AuthorizationChecker {
         this.isAuthorized = this.isAuthorized.bind(this);
     }
 
-    isAuthorized(currentUser, html) {
+    isAuthorized(currentUser, html, teams) {
         const {command, subcommand, team, location} = this.details(html);
+
         if (this.isToBeSeenByAll({command, subcommand, team, location})) {
             return true;
         }
@@ -12,9 +13,16 @@ class AuthorizationChecker {
             return true;
         } else if (subcommand.filter((c => currentUser['subcommandid'] === c)).length >= 1) {
             return true
-        } else if (team.filter((c => currentUser['teamid'] === c)).length >= 1) {
+        } else if (team.filter(c => {
+            return teams && teams.length ? this.getTeamId(c, teams) === currentUser['teamid'] : false;
+        }).length >= 1) {
             return true;
         } else return location.filter((c => currentUser['locationid'] === c)).length >= 1;
+    }
+
+    getTeamId(code, teams) {
+        const team = teams.find( t => t.teamcode === code );
+        return team ? team.teamid : '';
     }
 
     hasContent(object) {
