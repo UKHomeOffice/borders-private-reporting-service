@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  reporting:
+    build: .
+    image: quay.io/ukhomeofficedigital/cop-private-reporting-service:develop
+    restart: on-failure
+    container_name: reporting
+    environment:
+      PLATFORM_DATA_PROXY_URL: "http://localhost:8080"
+      REPORTING_SERVICE_NAME: "reporting"
+      DOMAIN: ""
+      SESSION_NAME: test
+      PRIVATE_REDIS_URL: redis
+      PRIVATE_REDIS_PORT: 6379
+      PRIVATE_REDIS_TOKEN: ""
+      SESSION_SECRET: reports
+      KEYCLOAK_REALM: refdata
+      KEYCLOAK_AUTH_URL: "http://keycloak:8080/keycloak/auth"
+      KEYCLOAK_CLIENT_ID: reporting
+    volumes:
+      - ${PWD}/workflow-rerources:/workflow-resources
+networks:
+  default:
+    external:
+      name: local_dev
