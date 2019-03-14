@@ -14,18 +14,16 @@ class ReportService {
         this.authorizationChecker = authorizationChecker;
     }
 
-
-    async report(reportName, currentUser) {
+    async report(reportName, currentUser, teams) {
         const fileName = `${this.config.reportsDir}/${reportName}`;
         const fileContent = await readFile(fileName, 'utf8');
         const html = cheerio.load(fileContent);
-        if (this.authorizationChecker.isAuthorized(currentUser, html)) {
+        if (this.authorizationChecker.isAuthorized(currentUser, html, teams)) {
             logger.info(`${currentUser.email} authorized to see ${fileName}`);
             return html;
         } else {
             return null;
         }
-
     }
 
     async reports(currentUser) {

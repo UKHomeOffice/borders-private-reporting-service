@@ -16,11 +16,14 @@ class ReportingController {
 
         const email = req.kauth.grant.access_token.content.email;
         const currentUser = await this.platformDataService.currentUserShift(email, token);
+        const teams = await this.platformDataService.getTeams(token);
 
         if (!currentUser) {
             this.unauthorizedResponse(email, res);
         } else {
-            const report = await this.reportingService.report(reportName, currentUser);
+            const teamCodes = teams!==null ? teams.map( ({ teamcode, teamid }) => ({ teamcode, teamid })) : [];
+            const report = await this.reportingService.report(reportName, currentUser, teamCodes);
+            
             if (report) {
                 const options = {
                     headers: {
