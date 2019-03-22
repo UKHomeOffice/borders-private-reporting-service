@@ -12,7 +12,7 @@ class PlatformDataService {
     async currentUserShift(email, token) {
         try {
             const response = await axios({
-                url: `${this.config.platformDataProxyUrl}/api/platform-data/shift?email=eq.${encodeURIComponent(email)}`,
+                url: `${this.config.platformDataProxyUrl}/api/platform-data/shift?email=eq.${encodeURIComponent(email)}&select=email,roles,location:rf_location(name:locationname),team(teamcode,ministry:rf_ministry(name:ministryname),department:rf_department(name:departmentname),directorate:rf_directorate(name:directoratename),branch:rf_branch(name:branchname),division:rf_division(name:divisionname),command:rf_command(name:commandname))`,
                 method: 'GET',
                 headers: {
                     'Content-Type' : 'application/json',
@@ -21,6 +21,7 @@ class PlatformDataService {
             });
             const shiftDetails = response.data ? response.data[0] : null;
             logger.info(`Shift details ${JSON.stringify(shiftDetails)}`);
+            
             return shiftDetails;
         } catch (err) {
             logger.error(`Failed to get shift details ${err.toString()}`);

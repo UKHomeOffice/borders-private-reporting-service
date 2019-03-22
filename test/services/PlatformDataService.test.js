@@ -6,7 +6,7 @@ import expect from "expect";
 import configConstants from "../../src/utilities/configConstants";
 
 
-describe.only('PlatformDataService', () => {
+describe('PlatformDataService', () => {
 
     const platformDataService = new PlatformDataService(configConstants());
 

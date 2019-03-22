@@ -1,52 +1,46 @@
+import _ from 'lodash';
+
 class AuthorizationChecker {
     constructor() {
         this.isAuthorized = this.isAuthorized.bind(this);
     }
 
-    isAuthorized(currentUser, html, teams) {
-        const {command, subcommand, team, location} = this.details(html);
+    isAuthorized(currentUser, html) {
+        const details = this.details(html);
+        const {ministry, directorate, department, branch, command, division, location, team, roles} = details;
+        
+        //if no meta data set, authorisation granted
+        if(_.every(details, c=>c.length===0) ) { return true;}
 
-        if (this.isToBeSeenByAll({command, subcommand, team, location})) {
-            return true;
-        }
-        if (command.filter((c => currentUser['commandid'] === c)).length >= 1) {
-            return true;
-        } else if (subcommand.filter((c => currentUser['subcommandid'] === c)).length >= 1) {
-            return true
-        } else if (team.filter(c => {
-            return teams && teams.length ? this.getTeamId(c, teams) === currentUser['teamid'] : false;
-        }).length >= 1) {
-            return true;
-        } else return location.filter((c => currentUser['locationid'] === c)).length >= 1;
+        if(roles.filter(c => currentUser.roles.includes(c)).length > 0 ){return true;}
+        if(this.checkAuthorisation(team,'team.teamcode',currentUser)) {return true;}
+        if(this.checkAuthorisation(location,'location.name',currentUser)) {return true;}
+        if(this.checkAuthorisation(division,'team.division.name',currentUser)) {return true;}
+        if(this.checkAuthorisation(command,'team.command.name',currentUser)) {return true;}
+        if(this.checkAuthorisation(branch,'team.branch.name',currentUser)) {return true;}
+        if(this.checkAuthorisation(department,'team.department.name',currentUser)) {return true;}
+        if(this.checkAuthorisation(directorate,'team.directorate.name',currentUser)) {return true;}
+        if(this.checkAuthorisation(ministry,'team.ministry.name',currentUser)) {return true;}
+
+        return false
+        
     }
 
-    getTeamId(code, teams) {
-        const team = teams.find( t => t.teamcode === code );
-        return team ? team.teamid : '';
-    }
-
-    hasContent(object) {
-        return object.length !== 0;
+    checkAuthorisation(type, path, currentUser) {
+        return type.filter(c => _.get(currentUser,path,'') === c).length > 0;
     }
 
     details(html) {
-        const command = html("meta[name='command']").attr("content") ? html("meta[name='command']").attr("content").split(',') : [];
-        const subcommand = html("meta[name='subcommand']").attr("content") ? html("meta[name='subcommand']").attr("content").split(',') : [];
-        const team = html("meta[name='team']").attr("content") ? html("meta[name='team']").attr("content").split(',') : [];
-        const location = html("meta[name='location']").attr("content") ? html("meta[name='location']").attr("content").split(',') : [];
-        return {
-            command,
-            subcommand,
-            team,
-            location
-        }
+        return Object.assign({},
+        ...['ministry','directorate','department','branch','command','division','location','team', 'roles']
+        .map( v => {
+            const meta = html(`meta[name='${v}']`).attr(`content`);
+            return{ [v] : meta ? this.format(meta).split(',') : [] };
+        }))
     }
 
-    isToBeSeenByAll({command, subcommand, team, location}) {
-      return !this.hasContent(command)
-          && !this.hasContent(subcommand)
-          && !this.hasContent(team)
-          && !this.hasContent(location)
+    format(value) {
+        return value.search(',') > 0 ? value.slice(0,value.indexOf(',')) : value;
     }
 
 }
