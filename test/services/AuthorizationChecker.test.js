@@ -94,6 +94,11 @@ describe('Authorization Checker', () => {
         it( `is authorised to view report if multiple roles`, () => {
             const html = cheerio.load(`<html><meta name="roles" content="contractor,copge"><body></body></html>`);
             expect(authorizationChecker.isAuthorized(validShift, html)).toEqual(true);
+        })
+
+        it( `is authorised to view report if invalid role with valid team`, () => {
+            const html = cheerio.load(`<html><meta name="roles" content="invalid role"><meta name="team" content="COP,COP_ADMIN"><body></body></html>`);
+            expect(authorizationChecker.isAuthorized(validShift, html)).toEqual(false);
         }) 
 
 

@@ -12,7 +12,9 @@ class AuthorizationChecker {
         //if no meta data set, authorisation granted
         if(_.every(details, c=>c.length===0) ) { return true;}
 
-        if(roles.filter(c => currentUser.roles.includes(c)).length > 0 ){return true;}
+        if(roles.length){
+            return roles.filter(c => currentUser.roles.includes(c)).length > 0;
+        }
         if(this.checkAuthorisation(team,'team.teamcode',currentUser)) {return true;}
         if(this.checkAuthorisation(location,'location.name',currentUser)) {return true;}
         if(this.checkAuthorisation(division,'team.division.name',currentUser)) {return true;}
