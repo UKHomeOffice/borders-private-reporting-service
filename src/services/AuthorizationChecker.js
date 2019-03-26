@@ -6,7 +6,7 @@ class AuthorizationChecker {
         this.isFeatureAuthorised = this.isFeatureAuthorised.bind(this);
     }
 
-    isAuthorized(currentUser, html, teams) {
+    isAuthorized(currentUser, html) {
         const {command, subcommand, team, location} = this.details(html);
 
         if (this.isToBeSeenByAll({command, subcommand, team, location})) {
@@ -16,18 +16,14 @@ class AuthorizationChecker {
             return true;
         } else if (subcommand.filter((c => currentUser['subcommandid'] === c)).length >= 1) {
             return true
-        } else if (team.filter(c => {
-            return teams && teams.length ? this.getTeamId(c, teams) === currentUser['teamid'] : false;
-        }).length >= 1) {
+        } else if (team.filter(c => currentUser['team']['teamcode'] === c).length >= 1) {
             return true;
         } else return location.filter((c => currentUser['locationid'] === c)).length >= 1;
     }
 
-    isFeatureAuthorised(currentUser,type, auth, teams) {
+    isFeatureAuthorised(currentUser,type, auth) {
         if(type === 'roles') {
             return auth.filter(c=>currentUser.roles.includes(c)).length > 0
-        } else if( type ==='team') {
-            return teams && teams.length ? auth.filter(c=>this.getTeamId(c,teams)===currentUser[this.getTypePath(type)]).length > 0 : false
         } else {
             return this.checkAuthorisation(auth,this.getTypePath(type), currentUser);
         }
@@ -39,14 +35,9 @@ class AuthorizationChecker {
 
     getTypePath(type) {
         const typeMap = {
-            team : 'teamid'
+            team : 'team.teamcode'
         }
         return typeMap[type];
-    }
-
-    getTeamId(code, teams) {
-        const team = teams.find( t => t.teamcode === code );
-        return team ? team.teamid : '';
     }
 
     hasContent(object) {

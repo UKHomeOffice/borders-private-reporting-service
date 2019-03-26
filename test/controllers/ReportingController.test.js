@@ -189,7 +189,6 @@ describe('Reporting Controller', () => {
             }
         });
         const shiftInfo = platformDataService.currentUserShift.resolves({"teamid": "teamid", "email": "email"});
-
         const res = {
             sendFile: function(fileName){
                 console.log(`Returning fileName ${fileName}`);

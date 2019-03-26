@@ -6,13 +6,12 @@ class PlatformDataService {
     constructor(config) {
         this.config = config;
         this.currentUserShift = this.currentUserShift.bind(this);
-        this.getTeams = this.getTeams.bind(this);
     }
 
     async currentUserShift(email, token) {
         try {
             const response = await axios({
-                url: `${this.config.platformDataProxyUrl}/api/platform-data/shift?email=eq.${encodeURIComponent(email)}`,
+                url: `${this.config.platformDataProxyUrl}/api/platform-data/shift?email=eq.${encodeURIComponent(email)}&select=email,team(teamcode,teamid),roles`,
                 method: 'GET',
                 headers: {
                     'Content-Type' : 'application/json',
@@ -25,26 +24,6 @@ class PlatformDataService {
         } catch (err) {
             logger.error(`Failed to get shift details ${err.toString()}`);
             return null;
-        }
-    }
-
-    async getTeams(token) {
-        try {
-            const response = await axios.get(
-                `${this.config.platformDataProxyUrl}/api/platform-data/team`,
-                {
-                    headers: {
-                        'Content-Type' : 'application/json',
-                        'Authorization' : `Bearer ${token}`
-                    }
-                })
-                const teams = response.data;
-                logger.info(`Team details ${JSON.stringify(teams)}`);
-                return teams;
-            
-        } catch (err) {
-            logger.error(`Failed to get team details ${err.toString()}`);
-            return null
         }
     }
 }
