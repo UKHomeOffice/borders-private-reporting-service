@@ -5,8 +5,8 @@ import fs from "fs";
 import path from 'path';
 import cheerio from "cheerio";
 
-describe.only('Reporting Service', () => {
-    let ac, rs, currentUser, teams;
+describe('Reporting Service', () => {
+    let ac, rs, currentUser;
     const config = {
         reportsDir:'test/reports'
     }

@@ -4,7 +4,7 @@ import fs from "fs";
 import path from 'path';
 import cheerio from "cheerio";
 
-describe.only('Authorization Checker', () => {
+describe('Authorization Checker', () => {
     const authorizationChecker = new AuthorizationChecker();
     let currentUser;
     
