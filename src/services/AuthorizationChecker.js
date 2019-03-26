@@ -23,9 +23,11 @@ class AuthorizationChecker {
         } else return location.filter((c => currentUser['locationid'] === c)).length >= 1;
     }
 
-    isFeatureAuthorised(currentUser,type, auth) {
+    isFeatureAuthorised(currentUser,type, auth, teams) {
         if(type === 'roles') {
             return auth.filter(c=>currentUser.roles.includes(c)).length > 0
+        } else if( type ==='team') {
+            return teams && teams.length ? auth.filter(c=>this.getTeamId(c,teams)===currentUser[this.getTypePath(type)]).length > 0 : false
         } else {
             return this.checkAuthorisation(auth,this.getTypePath(type), currentUser);
         }

@@ -10,7 +10,8 @@ describe('Authorization Checker', () => {
         "teamid" : "teamid",
         "commandid" : "commandid",
         "subcommandid": "subcommandid",
-        "locationid" : "locationid"
+        "locationid" : "locationid",
+        roles : ['contractor','copge']
     };
     const teamUser = {
             "teamid" : "67890"
@@ -97,14 +98,36 @@ describe('Authorization Checker', () => {
 
     })
 
-    it('is authorised at feature level', () => {
-        const authorized = authorizationChecker.isFeatureAuthorised(currentUser,'team',['teamid']);
+    it('is authorised by role at feature level', () => {
+        const authorized = authorizationChecker.isFeatureAuthorised(currentUser,'roles',['contractor']);
+        expect(authorized).toEqual(true);
+    })
+
+    it('is not authorised by role at feature level', () => {
+        const authorized = authorizationChecker.isFeatureAuthorised(currentUser,'roles',['developer']);
+        expect(authorized).toEqual(false);
+    })
+
+    it('is authorised by team at feature level', () => {
+        const teamUser = {
+            "teamid" : "67890"
+        };
+        const authorized = authorizationChecker.isFeatureAuthorised(teamUser,'team',['COP_ADMIN'], [{
+            teamid : "67890",
+            teamcode : "COP_ADMIN"
+        }]);
         expect(authorized).toEqual(true);
 
     })
 
-    it('is not authorised at feature level', () => {
-        const authorized = authorizationChecker.isFeatureAuthorised(currentUser,'team',['X']);
+    it('is not authorised by team at feature level', () => {
+        const teamUser = {
+            "teamid" : "67890"
+        };
+        const authorized = authorizationChecker.isFeatureAuthorised(teamUser,'team',['X'], [{
+            teamid : "67890",
+            teamcode : "COP_ADMIN"
+        }]);
         expect(authorized).toEqual(false);
     })
 
