@@ -12,10 +12,29 @@ describe('Authorization Checker', () => {
         "subcommandid": "subcommandid",
         "locationid" : "locationid"
     };
+    const teamUser = {
+            "teamid" : "67890"
+        };
+    const teams = [
+        {
+            teamid : "12345",
+            teamcode : "OSCT"
+        },
+        {
+            teamid : "67890",
+            teamcode : "COP_ADMIN"
+        },
+        {
+            teamid : "54321",
+            teamcode : "HOB"
+        },
+
+    ]
+
     it('is authorised by team id', () => {
         const file =  fs.readFileSync(path.join(__dirname, '../reports/test-report.html'), 'utf8');
         const html = cheerio.load(file);
-        const authorized = authorizationChecker.isAuthorized(currentUser, html);
+        const authorized = authorizationChecker.isAuthorized(teamUser, html, teams);
         expect(authorized).toEqual(true);
     });
     it('is not authorised', () => {
@@ -49,24 +68,7 @@ describe('Authorization Checker', () => {
         expect(authorized).toEqual(true);
     });
     it ('is authorised by team code', () => {
-        const teamUser = {
-            "teamid" : "12345"
-        };
-        const teams = [
-            {
-                teamid : "12345",
-                teamcode : "OSCT"
-            },
-            {
-                teamid : "67890",
-                teamcode : "COP_ADMIN"
-            },
-            {
-                teamid : "54321",
-                teamcode : "HOB"
-            },
-
-        ]
+        
         const file =  fs.readFileSync(path.join(__dirname, '../reports/test-report-4.html'), 'utf8');
         const html = cheerio.load(file);
 
@@ -95,5 +97,15 @@ describe('Authorization Checker', () => {
 
     })
 
+    it('is authorised at feature level', () => {
+        const authorized = authorizationChecker.isFeatureAuthorised(currentUser,'team',['teamid']);
+        expect(authorized).toEqual(true);
+
+    })
+
+    it('is not authorised at feature level', () => {
+        const authorized = authorizationChecker.isFeatureAuthorised(currentUser,'team',['X']);
+        expect(authorized).toEqual(false);
+    })
 
 });

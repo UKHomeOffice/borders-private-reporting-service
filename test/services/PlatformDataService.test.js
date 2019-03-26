@@ -6,7 +6,7 @@ import expect from "expect";
 import configConstants from "../../src/utilities/configConstants";
 
 
-describe.only('PlatformDataService', () => {
+describe('PlatformDataService', () => {
 
     const platformDataService = new PlatformDataService(configConstants());
 
@@ -56,7 +56,7 @@ describe.only('PlatformDataService', () => {
             done(err);
         });
     });
-    it ('can get team details', () => {
+    it ('can get team details', (done) => {
         nock('http://localhost:9001/', {
             'Authorization': 'Bearer token'
         }).log(console.log)

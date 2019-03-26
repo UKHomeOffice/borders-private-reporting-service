@@ -30,7 +30,7 @@ class ReportingController {
                         'access_token': token
                     }
                 };
-                res.sendFile(`${this.config.reportsDir}/${reportName}`, options);
+                res.status(200, options).send(report);
             } else {
                 responseHandler.res({
                     code: 401,
@@ -58,7 +58,7 @@ class ReportingController {
             const listOfReports = await this.reportingService.reports(currentUser);
             responseHandler.res(null, listOfReports, res);
         }
-    };
+    }
 
 }
 

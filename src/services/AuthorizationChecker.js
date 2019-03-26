@@ -1,6 +1,9 @@
+import _ from 'lodash';
+
 class AuthorizationChecker {
     constructor() {
         this.isAuthorized = this.isAuthorized.bind(this);
+        this.isFeatureAuthorised = this.isFeatureAuthorised.bind(this);
     }
 
     isAuthorized(currentUser, html, teams) {
@@ -18,6 +21,25 @@ class AuthorizationChecker {
         }).length >= 1) {
             return true;
         } else return location.filter((c => currentUser['locationid'] === c)).length >= 1;
+    }
+
+    isFeatureAuthorised(currentUser,type, auth) {
+        if(type === 'roles') {
+            return auth.filter(c=>currentUser.roles.includes(c)).length > 0
+        } else {
+            return this.checkAuthorisation(auth,this.getTypePath(type), currentUser);
+        }
+    }
+
+    checkAuthorisation(type, path, currentUser) {
+        return type.filter(c => _.get(currentUser,path,'') === c).length > 0;
+    }
+
+    getTypePath(type) {
+        const typeMap = {
+            team : 'teamid'
+        }
+        return typeMap[type];
     }
 
     getTeamId(code, teams) {
