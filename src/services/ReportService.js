@@ -20,10 +20,28 @@ class ReportService {
         const html = cheerio.load(fileContent);
         if (this.authorizationChecker.isAuthorized(currentUser, html, teams)) {
             logger.info(`${currentUser.email} authorized to see ${fileName}`);
-            return html;
+            return this.filterfeatures(html, currentUser, teams)
         } else {
             return null;
         }
+    }
+
+    filterfeatures(html, currentUser, teams) {
+        const types = ['roles','team'];
+        const dataAuthString = types.map( type=>`[data-auth-${type}]`);
+        const feature = html( dataAuthString.join() , 'body');
+        
+        feature.map( (i,f) => {
+            const dataAuth = Object.keys(f.attribs).find(a=>a.startsWith('data-auth-'))
+            const type = dataAuth.split('-').pop();
+            const attr = html(f).attr(`data-auth-${type}`)
+            if( !this.authorizationChecker.isFeatureAuthorised( currentUser, type, attr.split(), teams )) {
+                logger.info(`-- ${currentUser.email} not authorized to see feature : ${html(f).attr(`data-title`)}`);
+                html(f).remove();
+            }
+        })
+        
+        return html.html();
     }
 
     async reports(currentUser) {

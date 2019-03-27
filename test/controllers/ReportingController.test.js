@@ -22,10 +22,24 @@ describe('Reporting Controller', () => {
     let controller;
     let authorizationChecker = new AuthorizationChecker();
     let platformDataService;
+    let currentUser;
+
     beforeEach(() => {
         platformDataService = sinon.createStubInstance(PlatformDataService);
         controller = new ReportingController(new ReportService(testConfig(), authorizationChecker), testConfig(),
             platformDataService);
+        currentUser = {
+            shiftid: 'shiftid',
+            email: 'email',
+            roles: [
+                "role1",
+                "role2"
+            ],
+            team: {
+                teamcode: "COP_ADMIN",
+                teamid: "12345"
+            }
+        }
     });
     it('not authorized response if user is not in shift', (done) => {
         const request = httpMocks.createRequest({
@@ -84,7 +98,7 @@ describe('Reporting Controller', () => {
         const response = httpMocks.createResponse({
             eventEmitter: require('events').EventEmitter
         });
-        const shiftInfo = platformDataService.currentUserShift.resolves({"teamid": "teamid", "email": "email"});
+        const shiftInfo = platformDataService.currentUserShift.resolves(currentUser);
 
         controller.listReports(request, response);
         response.on('end', () => {
@@ -120,7 +134,7 @@ describe('Reporting Controller', () => {
         const response = httpMocks.createResponse({
             eventEmitter: require('events').EventEmitter
         });
-        const shiftInfo = platformDataService.currentUserShift.resolves({"teamid": "teamid", "email": "email"});
+        const shiftInfo = platformDataService.currentUserShift.resolves(currentUser);
 
         controller.listReports(request, response);
         response.on('end', () => {
@@ -188,13 +202,15 @@ describe('Reporting Controller', () => {
                 }
             }
         });
-        const shiftInfo = platformDataService.currentUserShift.resolves({"teamid": "teamid", "email": "email"});
-
+        const shiftInfo = platformDataService.currentUserShift.resolves(currentUser);
         const res = {
-            sendFile: function(fileName){
-                console.log(`Returning fileName ${fileName}`);
-                return fileName;
-            }
+             status: (code, options) => {
+                function send (file){
+                    console.log(`Returning file${file}`);
+                    return file;
+                }
+                return {send}
+             }
         };
         controller.getReport(request, res).then(() => {
             sinon.assert.calledOnce(shiftInfo);

@@ -16,13 +16,11 @@ class ReportingController {
 
         const email = req.kauth.grant.access_token.content.email;
         const currentUser = await this.platformDataService.currentUserShift(email, token);
-        const teams = await this.platformDataService.getTeams(token);
 
         if (!currentUser) {
             this.unauthorizedResponse(email, res);
         } else {
-            const teamCodes = teams!==null ? teams.map( ({ teamcode, teamid }) => ({ teamcode, teamid })) : [];
-            const report = await this.reportingService.report(reportName, currentUser, teamCodes);
+            const report = await this.reportingService.report(reportName, currentUser);
             
             if (report) {
                 const options = {
@@ -30,7 +28,7 @@ class ReportingController {
                         'access_token': token
                     }
                 };
-                res.sendFile(`${this.config.reportsDir}/${reportName}`, options);
+                res.status(200, options).send(report);
             } else {
                 responseHandler.res({
                     code: 401,
@@ -58,7 +56,7 @@ class ReportingController {
             const listOfReports = await this.reportingService.reports(currentUser);
             responseHandler.res(null, listOfReports, res);
         }
-    };
+    }
 
 }
 
