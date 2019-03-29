@@ -204,6 +204,9 @@ describe('Reporting Controller', () => {
         });
         const shiftInfo = platformDataService.currentUserShift.resolves(currentUser);
         const res = {
+             header: (options) => {
+                 console.log('options '+ JSON.stringify(options));
+             },
              status: (code, options) => {
                 function send (file){
                     console.log(`Returning file${file}`);

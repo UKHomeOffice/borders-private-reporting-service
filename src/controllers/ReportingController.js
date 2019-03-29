@@ -21,14 +21,10 @@ class ReportingController {
             this.unauthorizedResponse(email, res);
         } else {
             const report = await this.reportingService.report(reportName, currentUser);
-            
+
             if (report) {
-                const options = {
-                    headers: {
-                        'access_token': token
-                    }
-                };
-                res.status(200, options).send(report);
+                res.header('access_token', token);
+                res.status(200).send(report);
             } else {
                 responseHandler.res({
                     code: 401,
