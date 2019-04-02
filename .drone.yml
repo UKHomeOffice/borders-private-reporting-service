@@ -119,3 +119,118 @@ pipeline:
       event:
         - push
         - deployment
+
+  deploy_to_test:
+    image: quay.io/ukhomeofficedigital/kd
+    secrets:
+      - TEST_NAME
+      - TEST_KUBE_NAMESPACE
+      - TEST_KUBE_SERVER
+      - TEST_KUBE_TOKEN
+      - TEST_INTERNAL_CA_URL
+      - TEST_NO_LOGGING_URL_PARAMS
+      - TEST_NO_LOGGING_BODY
+      - TEST_NO_LOGGING_RESPONSE
+      - TEST_KEYCLOAK_URL
+      - TEST_KEYCLOAK_REALM
+      - TEST_KEYCLOAK_SECRET
+      - TEST_INT_DOMAIN
+      - TEST_EXT_DOMAIN
+      - TEST_PROTOCOL
+      - TEST_PRIVATE_UI_NAME
+      - TEST_RESOURCES_IMAGE
+      - TEST_SESSION_SECRET
+      - TEST_SESSION_NAME
+      - TEST_REDIS_URL
+      - TEST_REDIS_PORT
+      - TEST_REDIS_TOKEN
+    commands:
+      - export NAME=$${TEST_NAME}
+      - export KUBE_NAMESPACE=$${TEST_KUBE_NAMESPACE}
+      - export KUBE_SERVER=$${TEST_KUBE_SERVER}
+      - export KUBE_TOKEN=$${TEST_KUBE_TOKEN}
+      - export INTERNAL_CA_URL=$${TEST_INTERNAL_CA_URL}
+      - export NO_LOGGING_URL_PARAMS=$${TEST_NO_LOGGING_URL_PARAMS}
+      - export NO_LOGGING_BODY=$${TEST_NO_LOGGING_BODY}
+      - export NO_LOGGING_RESPONSE=$${TEST_NO_LOGGING_RESPONSE}
+      - export KEYCLOAK_URL=$${TEST_KEYCLOAK_URL}
+      - export KEYCLOAK_REALM=$${TEST_KEYCLOAK_REALM}
+      - export KEYCLOAK_SECRET=$${TEST_KEYCLOAK_SECRET}
+      - export INT_DOMAIN=$${TEST_INT_DOMAIN}
+      - export EXT_DOMAIN=$${TEST_EXT_DOMAIN}
+      - export PROTOCOL=$${TEST_PROTOCOL}
+      - export PRIVATE_UI_NAME=$${TEST_PRIVATE_UI_NAME}
+      - export RESOURCES_IMAGE=$${TEST_RESOURCES_IMAGE}
+      - export SESSION_SECRET=$${TEST_SESSION_SECRET}
+      - export SESSION_NAME=$${TEST_SESSION_NAME}
+      - export REDIS_URL=$${TEST_REDIS_URL}
+      - export REDIS_PORT=$${TEST_REDIS_PORT}
+      - export REDIS_TOKEN=$${TEST_REDIS_TOKEN}
+      - export IMAGE_TAG=${DRONE_BUILD_NUMBER}
+      - kd --insecure-skip-tls-verify -f kube/network-policy.yml
+      - kd --insecure-skip-tls-verify -f kube/secret.yml
+      - kd --insecure-skip-tls-verify -f kube/service.yml
+      - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
+    when:
+      branch:
+        - master
+      event:
+        - push
+        - deployment
+
+  deploy_to_demo:
+    image: quay.io/ukhomeofficedigital/kd
+    secrets:
+      - DEMO_NAME
+      - DEMO_KUBE_NAMESPACE
+      - DEMO_KUBE_SERVER
+      - DEMO_KUBE_TOKEN
+      - DEMO_INTERNAL_CA_URL
+      - DEMO_NO_LOGGING_URL_PARAMS
+      - DEMO_NO_LOGGING_BODY
+      - DEMO_NO_LOGGING_RESPONSE
+      - DEMO_KEYCLOAK_URL
+      - DEMO_KEYCLOAK_REALM
+      - DEMO_KEYCLOAK_SECRET
+      - DEMO_INT_DOMAIN
+      - DEMO_EXT_DOMAIN
+      - DEMO_PROTOCOL
+      - DEMO_PRIVATE_UI_NAME
+      - DEMO_RESOURCES_IMAGE
+      - DEMO_SESSION_SECRET
+      - DEMO_SESSION_NAME
+      - DEMO_REDIS_URL
+      - DEMO_REDIS_PORT
+      - DEMO_REDIS_TOKEN
+    commands:
+      - export NAME=$${DEMO_NAME}
+      - export KUBE_NAMESPACE=$${DEMO_KUBE_NAMESPACE}
+      - export KUBE_SERVER=$${DEMO_KUBE_SERVER}
+      - export KUBE_TOKEN=$${DEMO_KUBE_TOKEN}
+      - export INTERNAL_CA_URL=$${DEMO_INTERNAL_CA_URL}
+      - export NO_LOGGING_URL_PARAMS=$${DEMO_NO_LOGGING_URL_PARAMS}
+      - export NO_LOGGING_BODY=$${DEMO_NO_LOGGING_BODY}
+      - export NO_LOGGING_RESPONSE=$${DEMO_NO_LOGGING_RESPONSE}
+      - export KEYCLOAK_URL=$${DEMO_KEYCLOAK_URL}
+      - export KEYCLOAK_REALM=$${DEMO_KEYCLOAK_REALM}
+      - export KEYCLOAK_SECRET=$${DEMO_KEYCLOAK_SECRET}
+      - export INT_DOMAIN=$${DEMO_INT_DOMAIN}
+      - export EXT_DOMAIN=$${DEMO_EXT_DOMAIN}
+      - export PROTOCOL=$${DEMO_PROTOCOL}
+      - export PRIVATE_UI_NAME=$${DEMO_PRIVATE_UI_NAME}
+      - export RESOURCES_IMAGE=$${DEMO_RESOURCES_IMAGE}
+      - export SESSION_SECRET=$${DEMO_SESSION_SECRET}
+      - export SESSION_NAME=$${DEMO_SESSION_NAME}
+      - export REDIS_URL=$${DEMO_REDIS_URL}
+      - export REDIS_PORT=$${DEMO_REDIS_PORT}
+      - export REDIS_TOKEN=$${DEMO_REDIS_TOKEN}
+      - export IMAGE_TAG=${DRONE_BUILD_NUMBER}
+      - kd --insecure-skip-tls-verify -f kube/network-policy.yml
+      - kd --insecure-skip-tls-verify -f kube/secret.yml
+      - kd --insecure-skip-tls-verify -f kube/service.yml
+      - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
+    when:
+      branch:
+        - master
+      event:
+        - deployment
