@@ -3,7 +3,7 @@ version: '3'
 services:
   reporting:
     build: .
-    image: quay.io/ukhomeofficedigital/cop-private-reporting-service:develop
+    image: quay.io/ukhomeofficedigital/cop-private-reporting-service
     restart: on-failure
     container_name: reporting
     environment:

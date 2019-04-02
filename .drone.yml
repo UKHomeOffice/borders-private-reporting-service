@@ -1,10 +1,6 @@
-workspace:
-  base: /build
-  path: src/github.com/ukhomeoffice/cop-private-reporting-service1
-
 pipeline:
   test:
-      image: node:8
+      image: node:11
       commands:
         - npm install
         - npm run coverage
@@ -23,50 +19,103 @@ pipeline:
         - push
         - pull_request
 
+## Image building
   build:
-    image: docker:17.09.1
-    environment:
-      - DOCKER_HOST=tcp://172.17.0.1:2375
-    secrets:
-      - docker_name
+    image: quay.io/ukhomeofficedigital/drone-docker
     commands:
-      - docker build -t $${DOCKER_NAME} .
+      - docker build -t cop-private-reporting-service:$${DRONE_BUILD_NUMBER} .
     when:
       event:
         - push
         - pull_request
-        - tag
 
+## Vulnerability Scanning
+  vulnerability-scan:
+    image: quay.io/ukhomeofficedigital/anchore-submission:latest
+    image_name: cop-private-reporting-service:${DRONE_BUILD_NUMBER}
+    tolarates: medium
+    # An optional whitelist (comman separated list of CVE's)
+    # whitelist: CVE_SOMENAME_1,CVE_SOMENAME_2
+    # An optional whitelist file containing a list of CSV relative to the repo path
+    # whitelist_file: <PATH>
+    fail_on_detection: false
+    when:
+      event:
+        - push
+        - pull_request
+
+## Build Public Image
   image_to_quay:
-    image: docker:17.09.1
-    environment:
-      - DOCKER_HOST=tcp://172.17.0.1:2375
+    image: quay.io/ukhomeofficedigital/drone-docker
     secrets:
-      - docker_username
-      - docker_password
-      - docker_server
-      - docker_group
-      - docker_name
-    commands:
-    - docker login -u=$${DOCKER_USERNAME} -p=$${DOCKER_PASSWORD} $${DOCKER_SERVER}
-    - docker tag $${DOCKER_NAME} $${DOCKER_SERVER}/$${DOCKER_GROUP}/$${DOCKER_NAME}:$${DRONE_COMMIT_BRANCH}
-    - docker push $${DOCKER_SERVER}/$${DOCKER_GROUP}/$${DOCKER_NAME}:$${DRONE_COMMIT_BRANCH}
+      - DOCKER_USERNAME
+      - DOCKER_PASSWORD
+    registry: quay.io
+    repo: quay.io/ukhomeofficedigital/cop-private-reporting-service
+    tags:
+      - ${DRONE_BUILD_NUMBER}
+      - ${DRONE_COMMIT_SHA}
+      - latest
     when:
-      event: push
+      branch:
+        - master
+      event:
+        - push
 
-  tag_image_to_quay:
-    image: docker:17.09.1
-    environment:
-      - DOCKER_HOST=tcp://172.17.0.1:2375
+  deploy_to_dev:
+    image: quay.io/ukhomeofficedigital/kd
     secrets:
-      - docker_username
-      - docker_password
-      - docker_server
-      - docker_group
-      - docker_name
+      - DEV_NAME
+      - DEV_KUBE_NAMESPACE
+      - DEV_KUBE_SERVER
+      - DEV_KUBE_TOKEN
+      - DEV_INTERNAL_CA_URL
+      - DEV_NO_LOGGING_URL_PARAMS
+      - DEV_NO_LOGGING_BODY
+      - DEV_NO_LOGGING_RESPONSE
+      - DEV_KEYCLOAK_URL
+      - DEV_KEYCLOAK_REALM
+      - DEV_KEYCLOAK_SECRET
+      - DEV_INT_DOMAIN
+      - DEV_EXT_DOMAIN
+      - DEV_PROTOCOL
+      - DEV_PRIVATE_UI_NAME
+      - DEV_RESOURCES_IMAGE
+      - DEV_SESSION_SECRET
+      - DEV_SESSION_NAME
+      - DEV_REDIS_URL
+      - DEV_REDIS_PORT
+      - DEV_REDIS_TOKEN
     commands:
-    - docker login -u=$${DOCKER_USERNAME} -p=$${DOCKER_PASSWORD} $${DOCKER_SERVER}
-    - docker tag $${DOCKER_NAME} $${DOCKER_SERVER}/$${DOCKER_GROUP}/$${DOCKER_NAME}:$${DRONE_COMMIT_SHA}
-    - docker push $${DOCKER_SERVER}/$${DOCKER_GROUP}/$${DOCKER_NAME}:$${DRONE_COMMIT_SHA}
+      - export NAME=$${DEV_NAME}
+      - export KUBE_NAMESPACE=$${DEV_KUBE_NAMESPACE}
+      - export KUBE_SERVER=$${DEV_KUBE_SERVER}
+      - export KUBE_TOKEN=$${DEV_KUBE_TOKEN}
+      - export INTERNAL_CA_URL=$${DEV_INTERNAL_CA_URL}
+      - export NO_LOGGING_URL_PARAMS=$${DEV_NO_LOGGING_URL_PARAMS}
+      - export NO_LOGGING_BODY=$${DEV_NO_LOGGING_BODY}
+      - export NO_LOGGING_RESPONSE=$${DEV_NO_LOGGING_RESPONSE}
+      - export KEYCLOAK_URL=$${DEV_KEYCLOAK_URL}
+      - export KEYCLOAK_REALM=$${DEV_KEYCLOAK_REALM}
+      - export KEYCLOAK_SECRET=$${DEV_KEYCLOAK_SECRET}
+      - export INT_DOMAIN=$${DEV_INT_DOMAIN}
+      - export EXT_DOMAIN=$${DEV_EXT_DOMAIN}
+      - export PROTOCOL=$${DEV_PROTOCOL}
+      - export PRIVATE_UI_NAME=$${DEV_PRIVATE_UI_NAME}
+      - export RESOURCES_IMAGE=$${DEV_RESOURCES_IMAGE}
+      - export SESSION_SECRET=$${DEV_SESSION_SECRET}
+      - export SESSION_NAME=$${DEV_SESSION_NAME}
+      - export REDIS_URL=$${DEV_REDIS_URL}
+      - export REDIS_PORT=$${DEV_REDIS_PORT}
+      - export REDIS_TOKEN=$${DEV_REDIS_TOKEN}
+      - export IMAGE_TAG=${DRONE_BUILD_NUMBER}
+      - kd --insecure-skip-tls-verify -f kube/network-policy.yml
+      - kd --insecure-skip-tls-verify -f kube/secret.yml
+      - kd --insecure-skip-tls-verify -f kube/service.yml
+      - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
     when:
-      event: tag
+      branch:
+        - master
+      event:
+        - push
+        - deployment
