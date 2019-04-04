@@ -116,6 +116,9 @@ pipeline:
     when:
       branch:
         - master
+      environment:
+        - develop
+        - test
       event:
         - push
         - deployment
@@ -174,6 +177,9 @@ pipeline:
     when:
       branch:
         - master
+      environment:
+        - develop
+        - test
       event:
         - push
         - deployment
@@ -224,13 +230,13 @@ pipeline:
       - export REDIS_URL=$${DEMO_REDIS_URL}
       - export REDIS_PORT=$${DEMO_REDIS_PORT}
       - export REDIS_TOKEN=$${DEMO_REDIS_TOKEN}
-      - export IMAGE_TAG=${DRONE_BUILD_NUMBER}
+      - export IMAGE_TAG=${IMAGE_TAG}
       - kd --insecure-skip-tls-verify -f kube/network-policy.yml
       - kd --insecure-skip-tls-verify -f kube/secret.yml
       - kd --insecure-skip-tls-verify -f kube/service.yml
       - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
     when:
-      branch:
-        - master
+      environment:
+        - demo
       event:
         - deployment
