@@ -223,7 +223,7 @@ pipeline:
       - export REDIS_PORT=$${DEMO_REDIS_PORT}
       - export REDIS_TOKEN=$${DEMO_REDIS_TOKEN}
       - export IMAGE_TAG=$${IMAGE_TAG}
-      - echo "IMAGE: $IMAGE_TAG"
+      - echo $IMAGE_TAG
       - kd --insecure-skip-tls-verify -f kube/network-policy.yml
       - kd --insecure-skip-tls-verify -f kube/secret.yml
       - kd --insecure-skip-tls-verify -f kube/service.yml
