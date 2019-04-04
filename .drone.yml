@@ -200,8 +200,6 @@ pipeline:
       - DEMO_REDIS_URL
       - DEMO_REDIS_PORT
       - DEMO_REDIS_TOKEN
-    environment:
-      - IMAGE_TAG=${IMAGE_TAG}
     commands:
       - export NAME=$${DEMO_NAME}
       - export KUBE_NAMESPACE=$${DEMO_KUBE_NAMESPACE}
