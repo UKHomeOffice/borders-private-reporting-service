@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 
 services:
   reporting:
@@ -7,20 +7,33 @@ services:
     restart: on-failure
     container_name: reporting
     environment:
-      PLATFORM_DATA_PROXY_URL: "http://localhost:8080"
+      PLATFORM_DATA_PROXY_URL: "${SCHEME}://operational_data/"
       REPORTING_SERVICE_NAME: "reporting"
-      DOMAIN: ""
-      SESSION_NAME: test
+      DOMAIN: "${DOMAINNAME}"
+      SESSION_NAME: dev
       PRIVATE_REDIS_URL: redis
       PRIVATE_REDIS_PORT: 6379
       PRIVATE_REDIS_TOKEN: ""
       SESSION_SECRET: reports
-      KEYCLOAK_REALM: refdata
-      KEYCLOAK_AUTH_URL: "http://keycloak:8080/keycloak/auth"
+      KEYCLOAK_REALM: dev
+      KEYCLOAK_AUTH_URL: "${SCHEME}://keycloak.${DOMAINNAME}/auth"
       KEYCLOAK_CLIENT_ID: reporting
     volumes:
-      - ${PWD}/workflow-rerources:/workflow-resources
+      - ${REPORTING_DATA}:/workflow-resources
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:reporting.${DOMAINNAME}"
+      - "traefik.port=8080"
+      - "traefik.protocol=http"
+      - "traefik.docker.network=web"
+
+
 networks:
-  default:
+  db:
     external:
-      name: local_dev
+      name: db
+  web:
+    external:
+      name: web
