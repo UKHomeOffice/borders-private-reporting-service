@@ -79,6 +79,7 @@ pipeline:
       - DEV_INT_DOMAIN
       - DEV_EXT_DOMAIN
       - DEV_PROTOCOL
+      - DEV_WHITELIST
       - DEV_PRIVATE_UI_NAME
       - DEV_RESOURCES_IMAGE
       - DEV_SESSION_SECRET
@@ -101,6 +102,7 @@ pipeline:
       - export INT_DOMAIN=$${DEV_INT_DOMAIN}
       - export EXT_DOMAIN=$${DEV_EXT_DOMAIN}
       - export PROTOCOL=$${DEV_PROTOCOL}
+      - export WHITELIST=$${DEV_WHITELIST}
       - export PRIVATE_UI_NAME=$${DEV_PRIVATE_UI_NAME}
       - export RESOURCES_IMAGE=$${DEV_RESOURCES_IMAGE}
       - export SESSION_SECRET=$${DEV_SESSION_SECRET}
@@ -113,6 +115,7 @@ pipeline:
       - kd --insecure-skip-tls-verify -f kube/secret.yml
       - kd --insecure-skip-tls-verify -f kube/service.yml
       - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
+      - kd --insecure-skip-tls-verify -f kube/ingress.yml
     when:
       branch:
         - master
@@ -136,6 +139,7 @@ pipeline:
       - TEST_INT_DOMAIN
       - TEST_EXT_DOMAIN
       - TEST_PROTOCOL
+      - TEST_WHITELIST
       - TEST_PRIVATE_UI_NAME
       - TEST_RESOURCES_IMAGE
       - TEST_SESSION_SECRET
@@ -158,6 +162,7 @@ pipeline:
       - export INT_DOMAIN=$${TEST_INT_DOMAIN}
       - export EXT_DOMAIN=$${TEST_EXT_DOMAIN}
       - export PROTOCOL=$${TEST_PROTOCOL}
+      - export WHITELIST=$${TEST_WHITELIST}
       - export PRIVATE_UI_NAME=$${TEST_PRIVATE_UI_NAME}
       - export RESOURCES_IMAGE=$${TEST_RESOURCES_IMAGE}
       - export SESSION_SECRET=$${TEST_SESSION_SECRET}
@@ -170,6 +175,7 @@ pipeline:
       - kd --insecure-skip-tls-verify -f kube/secret.yml
       - kd --insecure-skip-tls-verify -f kube/service.yml
       - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
+      - kd --insecure-skip-tls-verify -f kube/ingress.yml
     when:
       branch:
         - master
@@ -193,6 +199,7 @@ pipeline:
       - DEMO_INT_DOMAIN
       - DEMO_EXT_DOMAIN
       - DEMO_PROTOCOL
+      - DEMO_WHITELIST
       - DEMO_PRIVATE_UI_NAME
       - DEMO_RESOURCES_IMAGE
       - DEMO_SESSION_SECRET
@@ -215,6 +222,7 @@ pipeline:
       - export INT_DOMAIN=$${DEMO_INT_DOMAIN}
       - export EXT_DOMAIN=$${DEMO_EXT_DOMAIN}
       - export PROTOCOL=$${DEMO_PROTOCOL}
+      - export WHITELIST=$${DEMO_WHITELIST}
       - export PRIVATE_UI_NAME=$${DEMO_PRIVATE_UI_NAME}
       - export RESOURCES_IMAGE=$${DEMO_RESOURCES_IMAGE}
       - export SESSION_SECRET=$${DEMO_SESSION_SECRET}
@@ -227,6 +235,7 @@ pipeline:
       - kd --insecure-skip-tls-verify -f kube/secret.yml
       - kd --insecure-skip-tls-verify -f kube/service.yml
       - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
+      - kd --insecure-skip-tls-verify -f kube/ingress.yml
     when:
       environment:
         - demo
