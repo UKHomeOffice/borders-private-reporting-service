@@ -96,8 +96,6 @@ axios.interceptors.response.use((response) => {
 });
 
 
-const platformDataProxyUrl = process.env.PLATFORM_DATA_PROXY_URL;
-
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -122,23 +120,6 @@ app.use('/api/reports', route.allRoutes(keycloak));
 
 app.use('/reportspublic', express.static(path.join(__dirname, '../reportspublic')));
 
-app.use('/api/platform-data', proxy(
-    {
-        target: platformDataProxyUrl,
-        onProxyReq: function(proxyReq, req) {
-            logger.info('Platform Data Proxy -->  ', req.method, req.path, '-->', platformDataProxyUrl, proxyReq.path);
-        },
-        onError: function (err, req, res) {
-            logger.error(err);
-            res.status(500);
-            res.json({error: 'Error when connecting to remote server.'});
-        },
-        logLevel: 'debug',
-        changeOrigin: true,
-        secure: process.env.NODE_ENV === 'production',
-        agent: process.env.NODE_ENV === 'production' ? https.globalAgent: null
-    }
-));
 
 const server = http.createServer(app).listen(app.get('port'), function () {
     logger.info('Listening on port %d', port);
