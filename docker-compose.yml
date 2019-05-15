@@ -7,7 +7,6 @@ services:
     restart: on-failure
     container_name: reporting
     environment:
-      PLATFORM_DATA_PROXY_URL: "${SCHEME}://operational_data/"
       REPORTING_SERVICE_NAME: "reporting"
       DOMAIN: "${DOMAINNAME}"
       SESSION_NAME: dev

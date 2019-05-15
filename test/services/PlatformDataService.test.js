@@ -1,20 +1,22 @@
 import PlatformDataService from "../../src/services/PlatformDataService";
 
-process.env.PLATFORM_DATA_PROXY_URL = 'http://localhost:9001';
 import nock from "nock";
 import expect from "expect";
 import path from "path";
-import configConstants from "../../src/utilities/configConstants";
 
 
 describe('PlatformDataService', () => {
     const config = {
         reportsDir : path.join(__dirname, '../reports'),
-        platformDataProxyUrl : process.env.PLATFORM_DATA_PROXY_URL
+        services: {
+            operationalData: {
+                url: 'http://localhost:9001'
+            }
+        }
     }
     const platformDataService = new PlatformDataService(config);
 
-    const API_URL = '/api/platform-data/shift?email=eq.email&select=email,team(teamcode,teamid),roles';
+    const API_URL = '/shift?email=eq.email&select=email,team(teamcode,teamid),roles';
 
     it('can get shift details', (done) => {
         nock('http://localhost:9001/', {
