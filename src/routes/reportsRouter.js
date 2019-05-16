@@ -3,13 +3,11 @@ import express from 'express';
 import healthController from '../controllers/healthController';
 import ReportingController from "../controllers/ReportingController";
 import ReportService from "../services/ReportService";
-import configConstants from "../utilities/configConstants";
+import config from "../config";
 import PlatformDataService from "../services/PlatformDataService";
 import AuthorizationChecker from "../services/AuthorizationChecker";
 
 const router = express.Router();
-
-const config = configConstants();
 
 const reportingController = new ReportingController(new ReportService(config, new AuthorizationChecker()), config,
     new PlatformDataService(config));

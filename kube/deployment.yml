@@ -133,8 +133,6 @@ spec:
           - name: resourcerepo
             mountPath: /workflow-resources
         env:
-        - name: PLATFORM_DATA_PROXY_URL
-          value: {{.PROTOCOL}}{{.PRIVATE_UI_NAME}}.{{.EXT_DOMAIN}}
         - name: REPORTING_SERVICE_NAME
           value: {{.NAME}}
         - name: WHITE_LISTED_DOMAIN
@@ -155,8 +153,6 @@ spec:
             secretKeyRef:
               name: {{.NAME}}
               key: sessionName
-        - name: DOMAIN
-          value: {{.EXT_DOMAIN}}
         - name: PRIVATE_REDIS_URL
           value: "{{.REDIS_URL}}"
         - name: PRIVATE_REDIS_PORT
@@ -166,6 +162,12 @@ spec:
             secretKeyRef:
               name: {{.NAME}}
               key: redisAuthToken
+        - name: PROTOCOL
+          value: {{.PROTOCOL}}
+        - name: INT_DOMAIN
+          value: {{.INT_DOMAIN}}
+        - name: OPERATIONAL_POSTGREST_NAME
+          value: {{.OPERATIONAL_POSTGREST_NAME}}
       volumes:
       - name: bundle
         configMap:

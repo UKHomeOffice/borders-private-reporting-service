@@ -4,17 +4,19 @@ import path from 'path';
 import expect from 'expect';
 
 process.env.WHITE_LISTED_DOMAIN = 'http://localhost:8000';
-process.env.PLATFORM_DATA_PROXY_URL = 'http://localhost:9000';
 
 import httpMocks from 'node-mocks-http';
 import AuthorizationChecker from "../../src/services/AuthorizationChecker";
 import PlatformDataService from "../../src/services/PlatformDataService";
 import * as sinon from "sinon";
 
-const testConfig = () => {
-    return {
-        reportsDir: path.join(__dirname, '../reports'),
-        baseUrl: `localhost:8000`
+const testConfig = {
+    reportsDir: path.join(__dirname, '../reports'),
+    baseUrl: `localhost:8000`,
+    services: {
+        operationalData: {
+            url: 'http://localhost:9000'
+        }
     }
 };
 
@@ -26,7 +28,7 @@ describe('Reporting Controller', () => {
 
     beforeEach(() => {
         platformDataService = sinon.createStubInstance(PlatformDataService);
-        controller = new ReportingController(new ReportService(testConfig(), authorizationChecker), testConfig(),
+        controller = new ReportingController(new ReportService(testConfig, authorizationChecker), testConfig,
             platformDataService);
         currentUser = {
             shiftid: 'shiftid',

@@ -7,9 +7,7 @@ services:
     restart: on-failure
     container_name: reporting
     environment:
-      PLATFORM_DATA_PROXY_URL: "${SCHEME}://operational_data/"
       REPORTING_SERVICE_NAME: "reporting"
-      DOMAIN: "${DOMAINNAME}"
       SESSION_NAME: dev
       PRIVATE_REDIS_URL: redis
       PRIVATE_REDIS_PORT: 6379
@@ -18,6 +16,9 @@ services:
       KEYCLOAK_REALM: dev
       KEYCLOAK_AUTH_URL: "${SCHEME}://keycloak.${DOMAINNAME}/auth"
       KEYCLOAK_CLIENT_ID: reporting
+      PROTOCOL: ${PROTOCOL}
+      INT_DOMAIN: ${INT_DOMAIN}
+      OPERATIONAL_POSTGREST_NAME: ${OPERATIONAL_POSTGREST_NAME}
     volumes:
       - ${REPORTING_DATA}:/workflow-resources
     networks:

@@ -22,6 +22,8 @@ import frameguard from 'frameguard';
 import redis from "redis";
 import session from "express-session";
 
+import config from '../src/config';
+
 const RedisStore = require('connect-redis')(session);
 
 const app = express();
@@ -96,7 +98,7 @@ axios.interceptors.response.use((response) => {
 });
 
 
-const platformDataProxyUrl = process.env.PLATFORM_DATA_PROXY_URL;
+const operationalDataUrl = config.services.operationalData.url;
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -124,9 +126,9 @@ app.use('/reportspublic', express.static(path.join(__dirname, '../reportspublic'
 
 app.use('/api/platform-data', proxy(
     {
-        target: platformDataProxyUrl,
+        target: operationalDataUrl,
         onProxyReq: function(proxyReq, req) {
-            logger.info('Platform Data Proxy -->  ', req.method, req.path, '-->', platformDataProxyUrl, proxyReq.path);
+            logger.info('Platform Data Proxy -->  ', req.method, req.path, '-->', operationalDataUrl, proxyReq.path);
         },
         onError: function (err, req, res) {
             logger.error(err);
