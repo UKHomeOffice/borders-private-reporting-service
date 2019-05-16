@@ -153,8 +153,6 @@ spec:
             secretKeyRef:
               name: {{.NAME}}
               key: sessionName
-        - name: DOMAIN
-          value: {{.EXT_DOMAIN}}
         - name: PRIVATE_REDIS_URL
           value: "{{.REDIS_URL}}"
         - name: PRIVATE_REDIS_PORT
@@ -164,6 +162,12 @@ spec:
             secretKeyRef:
               name: {{.NAME}}
               key: redisAuthToken
+        - name: PROTOCOL
+          value: {{.PROTOCOL}}
+        - name: INT_DOMAIN
+          value: {{.INT_DOMAIN}}
+        - name: OPERATIONAL_POSTGREST_NAME
+          value: {{.OPERATIONAL_POSTGREST_NAME}}
       volumes:
       - name: bundle
         configMap:
