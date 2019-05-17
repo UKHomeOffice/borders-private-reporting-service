@@ -14,7 +14,7 @@ const testConfig = {
     reportsDir: path.join(__dirname, '../reports'),
     baseUrl: `localhost:8000`,
     services: {
-        operationalData: {
+        platformData: {
             url: 'http://localhost:9000'
         }
     }

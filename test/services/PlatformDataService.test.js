@@ -9,7 +9,7 @@ describe('PlatformDataService', () => {
     const config = {
         reportsDir : path.join(__dirname, '../reports'),
         services: {
-            operationalData: {
+            platformData: {
                 url: 'http://localhost:9001'
             }
         }

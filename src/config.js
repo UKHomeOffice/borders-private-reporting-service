@@ -1,10 +1,10 @@
-const {PROTOCOL, INT_DOMAIN, OPERATIONAL_POSTGREST_NAME} = process.env;
+const {PROTOCOL, INT_DOMAIN, PLATFORM_DATA_NAME} = process.env;
 
 const config = {
     reportsDir: "/workflow-resources/reports",
     services: {
-        operationalData: {
-            url: `${PROTOCOL}://${OPERATIONAL_POSTGREST_NAME}.${INT_DOMAIN}`
+        platformData: {
+            url: `${PROTOCOL}://${PLATFORM_DATA_NAME}.${INT_DOMAIN}`
         }
     }
 };

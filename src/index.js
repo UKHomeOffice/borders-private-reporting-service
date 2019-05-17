@@ -98,7 +98,7 @@ axios.interceptors.response.use((response) => {
 });
 
 
-const operationalDataUrl = config.services.operationalData.url;
+const platformDataUrl = config.services.platformData.url;
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -126,9 +126,9 @@ app.use('/reportspublic', express.static(path.join(__dirname, '../reportspublic'
 
 app.use('/api/platform-data', proxy(
     {
-        target: operationalDataUrl,
+        target: platformDataUrl,
         onProxyReq: function(proxyReq, req) {
-            logger.info('Platform Data Proxy -->  ', req.method, req.path, '-->', operationalDataUrl, proxyReq.path);
+            logger.info('Platform Data Proxy -->  ', req.method, req.path, '-->', platformDataUrl, proxyReq.path);
         },
         onError: function (err, req, res) {
             logger.error(err);

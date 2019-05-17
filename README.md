@@ -9,7 +9,7 @@ Standalone Service that provides reports as IFrame components
 2. SESSION_NAME
 3. PROTOCOL
 4. INT_DOMAIN
-5. OPERATIONAL_POSTGREST_NAME
+5. PLATFORM_DATA_NAME
 6. AUTH_CLIENT_ID
 7. AUTH_URL
 8. AUTH_REALM
