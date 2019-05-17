@@ -166,8 +166,8 @@ spec:
           value: {{.PROTOCOL}}
         - name: INT_DOMAIN
           value: {{.INT_DOMAIN}}
-        - name: OPERATIONAL_POSTGREST_NAME
-          value: {{.OPERATIONAL_POSTGREST_NAME}}
+        - name: PLATFORM_DATA_NAME
+          value: {{.PLATFORM_DATA_NAME}}
       volumes:
       - name: bundle
         configMap:

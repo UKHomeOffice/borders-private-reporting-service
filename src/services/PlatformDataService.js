@@ -11,7 +11,7 @@ class PlatformDataService {
     async currentUserShift(email, token) {
         try {
             const response = await axios({
-                url: `${this.config.services.operationalData.url}/shift?email=eq.${encodeURIComponent(email)}&select=email,team(teamcode,teamid),roles`,
+                url: `${this.config.services.platformData.url}/shift?email=eq.${encodeURIComponent(email)}&select=email,team(teamcode,teamid),roles`,
                 method: 'GET',
                 headers: {
                     'Content-Type' : 'application/json',

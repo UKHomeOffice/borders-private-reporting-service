@@ -18,7 +18,7 @@ services:
       KEYCLOAK_CLIENT_ID: reporting
       PROTOCOL: ${PROTOCOL}
       INT_DOMAIN: ${INT_DOMAIN}
-      OPERATIONAL_POSTGREST_NAME: ${OPERATIONAL_POSTGREST_NAME}
+      PLATFORM_DATA_NAME: ${PLATFORM_DATA_NAME}
     volumes:
       - ${REPORTING_DATA}:/workflow-resources
     networks:
