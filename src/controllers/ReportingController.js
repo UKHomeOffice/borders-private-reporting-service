@@ -1,5 +1,6 @@
 import responseHandler from "../utilities/handlers/responseHandler";
 import * as logger from 'winston';
+import config from '../config';
 
 class ReportingController {
     constructor(reportingService, config, platformDataService) {
@@ -23,6 +24,9 @@ class ReportingController {
             const report = await this.reportingService.report(reportName, currentUser);
 
             if (report) {
+                config.cors.origin.split('|').forEach(domain => {
+                    res.header('x-frame-options', `allow from ${domain}`);
+                });
                 res.header('access_token', token);
                 res.status(200).send(report);
             } else {
