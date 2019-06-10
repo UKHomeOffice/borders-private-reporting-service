@@ -22,8 +22,8 @@ describe('Reporting Service', () => {
         currentUser = {
             email : 'test.developer@homeoffice.gov.uk',
             team : {
-                teamid : "67890",
-                teamcode : 'COP_ADMIN'
+                id : "67890",
+                code : 'COP_ADMIN'
             },
             roles : ['contractor','copge']
         }

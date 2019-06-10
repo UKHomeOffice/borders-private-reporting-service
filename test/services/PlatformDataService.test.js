@@ -16,7 +16,7 @@ describe('PlatformDataService', () => {
     }
     const platformDataService = new PlatformDataService(config);
 
-    const API_URL = '/shift?email=eq.email&select=email,team(teamcode,teamid),roles';
+    const API_URL = '/shift?email=eq.email&select=email,team(code,id),roles';
 
     it('can get shift details', (done) => {
         nock('http://localhost:9001/', {
@@ -32,8 +32,8 @@ describe('PlatformDataService', () => {
                         "role2"
                     ],
                     team: {
-                        teamcode: "COP_ADMIN",
-                        teamid: "12345"
+                        code: "COP_ADMIN",
+                        id: "12345"
                     }
                 }
             ]);
@@ -42,7 +42,7 @@ describe('PlatformDataService', () => {
             expect(shift.shiftid).toEqual("shiftid");
             expect(shift.email).toEqual("email");
             expect(shift.roles).toEqual(["role1","role2"]);
-            expect(shift.team).toEqual({teamcode: "COP_ADMIN",teamid: "12345"})
+            expect(shift.team).toEqual({code: "COP_ADMIN",id: "12345"})
             done();
         }).catch((err) => {
             done(err);

@@ -16,7 +16,7 @@ class AuthorizationChecker {
             return true;
         } else if (subcommand.filter((c => currentUser['subcommandid'] === c)).length >= 1) {
             return true
-        } else if (team.filter(c => currentUser['team']['teamcode'] === c).length >= 1) {
+        } else if (team.filter(c => currentUser['team']['code'] === c).length >= 1) {
             return true;
         } else return location.filter((c => currentUser['locationid'] === c)).length >= 1;
     }
@@ -35,7 +35,7 @@ class AuthorizationChecker {
 
     getTypePath(type) {
         const typeMap = {
-            team : 'team.teamcode'
+            team : 'team.code'
         }
         return typeMap[type];
     }

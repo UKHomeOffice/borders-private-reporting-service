@@ -38,8 +38,8 @@ describe('Reporting Controller', () => {
                 "role2"
             ],
             team: {
-                teamcode: "COP_ADMIN",
-                teamid: "12345"
+                code: "COP_ADMIN",
+                id: "12345"
             }
         }
     });

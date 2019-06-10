@@ -17,8 +17,8 @@ describe('Authorization Checker', () => {
             locationid : "locationid",
             roles : ['contractor','copge'],
             team : {
-                teamid : "67890",
-                teamcode : 'COP_ADMIN'
+                id : "67890",
+                code : 'COP_ADMIN'
             }
         }
     })
@@ -71,8 +71,8 @@ describe('Authorization Checker', () => {
     it ('is not authorised by team code', () => {
 
         currentUser.team = {
-            teamcode : 'X',
-            teamid : '12345'
+            code : 'X',
+            id : '12345'
         }
 
         const file =  fs.readFileSync(path.join(__dirname, '../reports/test-report-4.html'), 'utf8');
