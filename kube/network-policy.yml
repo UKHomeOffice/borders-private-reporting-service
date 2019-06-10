@@ -9,8 +9,8 @@ spec:
   ingress:
     - from:
         - namespaceSelector:
-          matchLabels:
-            name: ingress-external
+            matchLabels:
+              name: ingress-external
         - podSelector:
             matchLabels:
               name: {{.PRIVATE_UI_NAME}}
