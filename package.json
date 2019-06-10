@@ -35,6 +35,7 @@
     "cheerio": "^1.0.0-rc.2",
     "connect-redis": "^3.4.0",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.5",
     "eslint-plugin-import": "^2.10.0",
     "event-stream": "^4.0.1",
     "express": "^4.16.2",

@@ -88,6 +88,7 @@ pipeline:
       - DEV_REDIS_PORT
       - DEV_REDIS_TOKEN
       - DEV_PLATFORM_DATA_NAME
+      - DEV_CORS_ORIGIN
     commands:
       - export NAME=$${DEV_NAME}
       - export KUBE_NAMESPACE=$${DEV_KUBE_NAMESPACE}
@@ -112,6 +113,7 @@ pipeline:
       - export REDIS_PORT=$${DEV_REDIS_PORT}
       - export REDIS_TOKEN=$${DEV_REDIS_TOKEN}
       - export PLATFORM_DATA_NAME=$${DEV_PLATFORM_DATA_NAME}
+      - export CORS_ORIGIN=$${DEV_CORS_ORIGIN}
       - export IMAGE_TAG=$${DRONE_BUILD_NUMBER}
       - kd --insecure-skip-tls-verify -f kube/network-policy.yml
       - kd --insecure-skip-tls-verify -f kube/secret.yml
@@ -212,6 +214,7 @@ pipeline:
       - DEMO_REDIS_PORT
       - DEMO_REDIS_TOKEN
       - DEMO_PLATFORM_DATA_NAME
+      - DEMO_CORS_ORIGIN
     commands:
       - export NAME=$${DEMO_NAME}
       - export KUBE_NAMESPACE=$${DEMO_KUBE_NAMESPACE}
@@ -236,6 +239,7 @@ pipeline:
       - export REDIS_PORT=$${DEMO_REDIS_PORT}
       - export REDIS_TOKEN=$${DEMO_REDIS_TOKEN}
       - export PLATFORM_DATA_NAME=$${DEMO_PLATFORM_DATA_NAME}
+      - export CORS_ORIGIN=$${DEMO_CORS_ORIGIN}
       - export IMAGE_TAG=$${IMAGE_TAG}
       - kd --insecure-skip-tls-verify -f kube/network-policy.yml
       - kd --insecure-skip-tls-verify -f kube/secret.yml

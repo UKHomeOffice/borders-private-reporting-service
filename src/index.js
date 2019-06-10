@@ -22,6 +22,8 @@ import frameguard from 'frameguard';
 import redis from "redis";
 import session from "express-session";
 
+import cors from 'cors';
+
 import config from '../src/config';
 
 const RedisStore = require('connect-redis')(session);
@@ -119,6 +121,13 @@ app.use(keycloak.middleware());
 app.disable('x-powered-by');
 
 app.enable('trust proxy');
+
+if (config.cors.origin) {
+    app.use(cors({
+        origin: config.cors.origin,
+        optionsSuccessStatus: 200
+    }));
+}
 
 app.use('/api/reports', route.allRoutes(keycloak));
 
