@@ -4,7 +4,7 @@ const config = {
     reportsDir: "/workflow-resources/reports",
     services: {
         platformData: {
-            url: `${PROTOCOL}://${PLATFORM_DATA_NAME}.${INT_DOMAIN}`
+            url: `${PROTOCOL}${PLATFORM_DATA_NAME}.${INT_DOMAIN}`
         }
     },
     cors: {
