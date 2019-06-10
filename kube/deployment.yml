@@ -168,6 +168,8 @@ spec:
           value: {{.INT_DOMAIN}}
         - name: PLATFORM_DATA_NAME
           value: {{.PLATFORM_DATA_NAME}}
+        - name: CORS_ORIGIN
+          value: {{.CORS_ORIGIN}}
       volumes:
       - name: bundle
         configMap:

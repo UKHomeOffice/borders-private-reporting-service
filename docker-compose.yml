@@ -19,6 +19,7 @@ services:
       PROTOCOL: ${PROTOCOL}
       INT_DOMAIN: ${INT_DOMAIN}
       PLATFORM_DATA_NAME: ${PLATFORM_DATA_NAME}
+      CORS_ORIGIN: ${CORS_ORIGIN}
     volumes:
       - ${REPORTING_DATA}:/workflow-resources
     networks:
