@@ -17,6 +17,9 @@ const testConfig = {
         platformData: {
             url: 'http://localhost:9000'
         }
+    },
+    cors: {
+        origin: 'http://localhost:8080'
     }
 };
 

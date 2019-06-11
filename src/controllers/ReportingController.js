@@ -23,6 +23,9 @@ class ReportingController {
             const report = await this.reportingService.report(reportName, currentUser);
 
             if (report) {
+                `${this.config.cors.origin}|sameorigin`.split('|').forEach(domain => {
+                    res.header('x-frame-options', `allow from ${domain}`);
+                });
                 res.header('access_token', token);
                 res.status(200).send(report);
             } else {
