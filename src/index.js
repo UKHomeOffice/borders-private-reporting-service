@@ -116,7 +116,9 @@ app.use(bodyParser.json());
 app.use(morgan('common'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(expressValidator());
-app.use(helmet());
+app.use(helmet({
+    frameguard: false
+}));
 app.use(keycloak.middleware());
 app.disable('x-powered-by');
 
