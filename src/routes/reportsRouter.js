@@ -1,6 +1,4 @@
 import express from 'express';
-
-import healthController from '../controllers/healthController';
 import ReportingController from "../controllers/ReportingController";
 import ReportService from "../services/ReportService";
 import config from "../config";
