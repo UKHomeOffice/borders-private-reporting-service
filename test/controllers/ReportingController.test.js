@@ -209,7 +209,7 @@ describe('Reporting Controller', () => {
              header: (options) => {
                  console.log('options '+ JSON.stringify(options));
              },
-             status: (code, options) => {
+             status: () => {
                 function send (file){
                     console.log(`Returning file${file}`);
                     return file;

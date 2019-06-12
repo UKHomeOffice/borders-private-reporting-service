@@ -4,6 +4,7 @@ pipeline:
       commands:
         - npm install
         - npm run coverage
+        - npm run linter
       when:
         event:
         - push

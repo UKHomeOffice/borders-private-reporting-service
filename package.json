@@ -9,7 +9,7 @@
     "start": "node dist",
     "test": "node_modules/.bin/mocha --require babel-polyfill --require babel-register --exit --recursive --timeout 5000",
     "coverage": "nyc --reporter=lcov mocha --require babel-polyfill --require babel-register --exit --recursive --timeout 5000",
-    "linter": "eslint src"
+    "linter": "eslint src test"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
@@ -19,7 +19,8 @@
     },
     "env": {
       "node": true,
-      "es6": true
+      "es6": true,
+      "jest": true
     },
     "rules": {
       "no-console": 0,
