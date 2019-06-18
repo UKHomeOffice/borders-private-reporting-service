@@ -77,7 +77,6 @@ pipeline:
       - DEV_KEYCLOAK_URL
       - DEV_KEYCLOAK_REALM
       - DEV_KEYCLOAK_SECRET
-      - DEV_INT_DOMAIN
       - DEV_EXT_DOMAIN
       - DEV_PROTOCOL
       - DEV_WHITELIST
@@ -102,7 +101,6 @@ pipeline:
       - export KEYCLOAK_URL=$${DEV_KEYCLOAK_URL}
       - export KEYCLOAK_REALM=$${DEV_KEYCLOAK_REALM}
       - export KEYCLOAK_SECRET=$${DEV_KEYCLOAK_SECRET}
-      - export INT_DOMAIN=$${DEV_INT_DOMAIN}
       - export EXT_DOMAIN=$${DEV_EXT_DOMAIN}
       - export PROTOCOL=$${DEV_PROTOCOL}
       - export WHITELIST=$${DEV_WHITELIST}
@@ -141,7 +139,6 @@ pipeline:
 #      - TEST_KEYCLOAK_URL
 #      - TEST_KEYCLOAK_REALM
 #      - TEST_KEYCLOAK_SECRET
-#      - TEST_INT_DOMAIN
 #      - TEST_EXT_DOMAIN
 #      - TEST_PROTOCOL
 #      - TEST_WHITELIST
@@ -165,7 +162,6 @@ pipeline:
 #      - export KEYCLOAK_URL=$${TEST_KEYCLOAK_URL}
 #      - export KEYCLOAK_REALM=$${TEST_KEYCLOAK_REALM}
 #      - export KEYCLOAK_SECRET=$${TEST_KEYCLOAK_SECRET}
-#      - export INT_DOMAIN=$${TEST_INT_DOMAIN}
 #      - export EXT_DOMAIN=$${TEST_EXT_DOMAIN}
 #      - export PROTOCOL=$${TEST_PROTOCOL}
 #      - export WHITELIST=$${TEST_WHITELIST}
@@ -203,7 +199,6 @@ pipeline:
       - DEMO_KEYCLOAK_URL
       - DEMO_KEYCLOAK_REALM
       - DEMO_KEYCLOAK_SECRET
-      - DEMO_INT_DOMAIN
       - DEMO_EXT_DOMAIN
       - DEMO_PROTOCOL
       - DEMO_WHITELIST
@@ -228,7 +223,6 @@ pipeline:
       - export KEYCLOAK_URL=$${DEMO_KEYCLOAK_URL}
       - export KEYCLOAK_REALM=$${DEMO_KEYCLOAK_REALM}
       - export KEYCLOAK_SECRET=$${DEMO_KEYCLOAK_SECRET}
-      - export INT_DOMAIN=$${DEMO_INT_DOMAIN}
       - export EXT_DOMAIN=$${DEMO_EXT_DOMAIN}
       - export PROTOCOL=$${DEMO_PROTOCOL}
       - export WHITELIST=$${DEMO_WHITELIST}

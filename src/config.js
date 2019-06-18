@@ -1,10 +1,10 @@
-const {PROTOCOL, INT_DOMAIN, PLATFORM_DATA_NAME, CORS_ORIGIN} = process.env;
+const {OPERATIONAL_DATA_URL, CORS_ORIGIN, REPORTS_DIR} = process.env;
 
 const config = {
-    reportsDir: "/workflow-resources/reports",
+    reportsDir: REPORTS_DIR || "/workflow-resources/reports",
     services: {
         platformData: {
-            url: `${PROTOCOL}${PLATFORM_DATA_NAME}.${INT_DOMAIN}`
+            url: OPERATIONAL_DATA_URL
         }
     },
     cors: {
