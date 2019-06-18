@@ -2,18 +2,22 @@
 
 Standalone Service that provides reports as IFrame components
 
+## Running
+
+1. Copy `sample.env` to `.env` and edit to suit your environment.
+2. Source the resulting file to export the variables. e.g `. .env`
+3. `npm run dev`
 
 ### Environment Variables
 
-1. SESSION_SECRET
-2. SESSION_NAME
-3. PROTOCOL
-4. INT_DOMAIN
-5. PLATFORM_DATA_NAME
-6. AUTH_CLIENT_ID
-7. AUTH_URL
-8. AUTH_REALM
-9. WHITE_LISTED_DOMAIN
+1. SESSION\_SECRET
+2. SESSION\_NAME
+3. OPERATIONAL\_DATA\_URL
+4. AUTH\_CLIENT\_ID
+5. AUTH\_URL
+6. AUTH\_REALM
+7. WHITE\_LISTED\_DOMAIN
+8. REPORTS\_DIR
 
 (c) Crown Copyright 2018 - MIT License
 

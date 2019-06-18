@@ -10,7 +10,6 @@ import http from 'http';
 import https from 'https';
 import fs from 'fs';
 import path from 'path';
-import proxy from 'http-proxy-middleware';
 
 import Keycloak from 'keycloak-connect';
 import * as axios from "axios";
@@ -134,24 +133,6 @@ if (config.cors.origin) {
 app.use('/api/reports', route.allRoutes(keycloak));
 
 app.use('/reportspublic', express.static(path.join(__dirname, '../reportspublic')));
-
-app.use('/api/platform-data', proxy(
-    {
-        target: platformDataUrl,
-        onProxyReq: function(proxyReq, req) {
-            logger.info('Platform Data Proxy -->  ', req.method, req.path, '-->', platformDataUrl, proxyReq.path);
-        },
-        onError: function (err, req, res) {
-            logger.error(err);
-            res.status(500);
-            res.json({error: 'Error when connecting to remote server.'});
-        },
-        logLevel: 'debug',
-        changeOrigin: true,
-        secure: process.env.NODE_ENV === 'production',
-        agent: process.env.NODE_ENV === 'production' ? https.globalAgent: null
-    }
-));
 
 const server = http.createServer(app).listen(app.get('port'), function () {
     logger.info('Listening on port %d', port);
