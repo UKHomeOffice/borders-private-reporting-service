@@ -2,6 +2,11 @@
 
 Standalone Service that provides reports as IFrame components
 
+## Running
+
+1. Copy `sample.env` to `.env` and edit to suit your environment.
+2. Source the resulting file to export the variables. e.g `. .env`
+3. `npm run dev`
 
 ### Environment Variables
 
