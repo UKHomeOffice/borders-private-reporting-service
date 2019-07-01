@@ -13,7 +13,7 @@ class PlatformDataService {
             const response = await axios({
                 url: `${this.config.services.platformData.url}/shift?email=eq.${encodeURIComponent(email)}&select=email,team(code,id),roles`,
                 method: 'GET',
-                timeout: 500,
+                timeout: 1000,
                 headers: {
                     'Content-Type' : 'application/json',
                     'Authorization' : `Bearer ${token}`
