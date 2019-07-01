@@ -2,6 +2,7 @@ process.env.NODE_ENV = 'test';
 process.env.SESSION_SECRET="test";
 process.env.SESSION_NAME="test";
 process.env.WHITE_LISTED_DOMAIN = 'http://localhost:8000';
+process.env.OPERATIONAL_DATA_URL = 'http://data.example.com';
 
 import * as logger from 'winston';
 const chai = require('chai');
