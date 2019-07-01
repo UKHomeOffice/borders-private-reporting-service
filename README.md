@@ -18,6 +18,7 @@ Standalone Service that provides reports as IFrame components
 6. AUTH\_REALM
 7. WHITE\_LISTED\_DOMAIN
 8. REPORTS\_DIR
+9. CORS\_ORIGIN
 
 (c) Crown Copyright 2018 - MIT License
 
