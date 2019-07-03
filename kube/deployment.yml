@@ -135,9 +135,9 @@ spec:
             mountPath: /workflow-resources
         env:
         - name: OPERATIONAL_DATA_URL
-          value: {{.PROTOCOL}}.{{.PLATFORM_DATA_NAME}}.{{.EXT_DOMAIN}}
+          value: {{.PROTOCOL}}{{.PLATFORM_DATA_NAME}}.{{.EXT_DOMAIN}}
         - name: WHITE_LISTED_DOMAIN
-          value: {{.PROTOCOL}}.{{.PRIVATE_UI_NAME}}.{{.EXT_DOMAIN}}
+          value: {{.PROTOCOL}}{{.PRIVATE_UI_NAME}}.{{.EXT_DOMAIN}}
         - name: AUTH_CLIENT_ID
           value: {{.NAME}}
         - name: AUTH_URL
