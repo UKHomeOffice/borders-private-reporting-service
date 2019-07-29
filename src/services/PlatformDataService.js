@@ -11,9 +11,9 @@ class PlatformDataService {
     async currentUserShift(email, token) {
         try {
             const response = await axios({
-                url: `${this.config.services.platformData.url}/shift?email=eq.${encodeURIComponent(email)}&select=email,team(code,id),roles`,
+                url: `${this.config.services.platformData.url}/v1/shift?email=eq.${email}`,
                 method: 'GET',
-                timeout: 1000,
+                timeout: 1500,
                 headers: {
                     'Content-Type' : 'application/json',
                     'Authorization' : `Bearer ${token}`
@@ -21,11 +21,32 @@ class PlatformDataService {
             });
             const shiftDetails = response.data ? response.data[0] : null;
             logger.info(`Shift details ${JSON.stringify(shiftDetails)}`);
+            if (shiftDetails) {
+              shiftDetails.team = await this.teamById(shiftDetails.teamid, token)
+            }
             return shiftDetails;
         } catch (err) {
-            logger.error(`Failed to get shift details ${err.toString()}`);
+            logger.error(`Failed to get shift details ${err.toString()}`, err);
             return null;
         }
+    }
+
+    async teamById(teamId, token) {
+      try {
+          const response = await axios({
+              url: `${this.config.services.platformData.url}/v1/team?id=eq.${teamId}`,
+              method: 'GET',
+              timeout: 1500,
+              headers: {
+                  'Content-Type' : 'application/json',
+                  'Authorization' : `Bearer ${token}`
+              }
+          });
+          return response.data ? response.data[0] : null;
+      } catch(err) {
+            logger.error(`Failed to get team details ${err.toString()}`, err);
+            return null;
+      }
     }
 }
 

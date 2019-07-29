@@ -16,13 +16,14 @@ describe('PlatformDataService', () => {
     }
     const platformDataService = new PlatformDataService(config);
 
-    const API_URL = '/shift?email=eq.email&select=email,team(code,id),roles';
+    const SHIFT_API_URL = '/v1/shift?email=eq.email';
+    const TEAM_API_URL = '/v1/team?id=eq.12345';
 
     it('can get shift details', (done) => {
         nock('http://localhost:9001/', {
             'Authorization': 'Bearer token'
         }).log(console.log)
-            .get(API_URL)
+            .get(SHIFT_API_URL)
             .reply(200, [
                 {
                     shiftid: 'shiftid',
@@ -31,10 +32,17 @@ describe('PlatformDataService', () => {
                         "role1",
                         "role2"
                     ],
-                    team: {
-                        code: "COP_ADMIN",
-                        id: "12345"
-                    }
+                    teamid: "12345"
+                }
+            ]);
+        nock('http://localhost:9001/', {
+            'Authorization': 'Bearer token'
+        }).log(console.log)
+            .get(TEAM_API_URL)
+            .reply(200, [
+                {
+                    id: "12345",
+                    code: "COP_ADMIN"
                 }
             ]);
 
@@ -53,7 +61,7 @@ describe('PlatformDataService', () => {
         nock('http://localhost:9001/', {
             'Authorization': 'Bearer token'
         }).log(console.log)
-            .get(API_URL)
+            .get(SHIFT_API_URL)
             .reply(504, []);
         platformDataService.currentUserShift("email").then((shift) => {
             expect(shift).toEqual(null);
@@ -67,7 +75,7 @@ describe('PlatformDataService', () => {
         nock('http://localhost:9001/', {
             'Authorization': 'Bearer token'
         }).log(console.log)
-            .get(API_URL)
+            .get(SHIFT_API_URL)
             .reply(200, []);
         platformDataService.currentUserShift("email").then((shift) => {
             expect(shift).toEqual(undefined);
@@ -77,4 +85,39 @@ describe('PlatformDataService', () => {
         });
     });
 
+  it('can get team details', done => {
+        nock('http://localhost:9001/', {
+            'Authorization': 'Bearer token'
+        }).log(console.log)
+        .get(TEAM_API_URL)
+        .reply(200, [
+            {
+                id: "12345",
+                code: "COP_ADMIN"
+            }
+        ]);
+
+      platformDataService.teamById("12345", "token")
+        .then(team => {
+          expect(team).toEqual({id: "12345", code: "COP_ADMIN"});
+          done();
+        }).catch(err => {
+          done(err);
+        });
+  });
+  it('returns no team details on error', done => {
+        nock('http://localhost:9001/', {
+            'Authorization': 'Bearer token'
+        }).log(console.log)
+        .get(TEAM_API_URL)
+        .reply(504, []);
+
+      platformDataService.teamById("12345", "token")
+        .then(team => {
+          expect(team).toEqual(null);
+          done();
+        }).catch(err => {
+          done(err);
+        });
+  });
 });
