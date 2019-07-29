@@ -99,8 +99,6 @@ axios.interceptors.response.use((response) => {
 });
 
 
-const platformDataUrl = config.services.platformData.url;
-
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
