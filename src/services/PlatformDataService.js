@@ -26,12 +26,13 @@ class PlatformDataService {
             }
             return shiftDetails;
         } catch (err) {
-            logger.error(`Failed to get shift details ${err.toString()}`);
+            logger.error(`Failed to get shift details ${err.toString()}`, err);
             return null;
         }
     }
 
     async teamById(teamId, token) {
+      try {
           const response = await axios({
               url: `${this.config.services.platformData.url}/v1/team?id=eq.${teamId}`,
               method: 'GET',
@@ -42,6 +43,10 @@ class PlatformDataService {
               }
           });
           return response.data ? response.data[0] : null;
+      } catch(err) {
+            logger.error(`Failed to get team details ${err.toString()}`, err);
+            return null;
+      }
     }
 }
 

@@ -85,4 +85,39 @@ describe('PlatformDataService', () => {
         });
     });
 
+  it('can get team details', done => {
+        nock('http://localhost:9001/', {
+            'Authorization': 'Bearer token'
+        }).log(console.log)
+        .get(TEAM_API_URL)
+        .reply(200, [
+            {
+                id: "12345",
+                code: "COP_ADMIN"
+            }
+        ]);
+
+      platformDataService.teamById("12345", "token")
+        .then(team => {
+          expect(team).toEqual({id: "12345", code: "COP_ADMIN"});
+          done();
+        }).catch(err => {
+          done(err);
+        });
+  });
+  it('returns no team details on error', done => {
+        nock('http://localhost:9001/', {
+            'Authorization': 'Bearer token'
+        }).log(console.log)
+        .get(TEAM_API_URL)
+        .reply(504, []);
+
+      platformDataService.teamById("12345", "token")
+        .then(team => {
+          expect(team).toEqual(null);
+          done();
+        }).catch(err => {
+          done(err);
+        });
+  });
 });
