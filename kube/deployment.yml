@@ -139,7 +139,7 @@ spec:
         - name: WHITE_LISTED_DOMAIN
           value: {{.PROTOCOL}}{{.PRIVATE_UI_NAME}}.{{.EXT_DOMAIN}}
         - name: AUTH_CLIENT_ID
-          value: {{.NAME}}
+          value: {{.KEYCLOAK_CLIENT_ID}}
         - name: AUTH_URL
           value: {{.KEYCLOAK_URL}}
         - name: AUTH_REALM
