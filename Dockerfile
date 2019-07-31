@@ -1,4 +1,4 @@
-FROM quay.io/ukhomeofficedigital/nodejs-base:v8.11.1
+FROM node:11
 
 ENV USER user-reporting-service
 ENV GROUP group-reporting-service
