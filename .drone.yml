@@ -31,19 +31,20 @@ pipeline:
         - pull_request
 
 ## Vulnerability Scanning
-  vulnerability-scan:
-    image: quay.io/ukhomeofficedigital/anchore-submission:latest
-    image_name: cop-private-reporting-service:${DRONE_BUILD_NUMBER}
-    tolarates: medium
-    # An optional whitelist (comman separated list of CVE's)
-    # whitelist: CVE_SOMENAME_1,CVE_SOMENAME_2
-    # An optional whitelist file containing a list of CSV relative to the repo path
-    # whitelist_file: <PATH>
-    fail_on_detection: false
-    when:
-      event:
-        - push
-        - pull_request
+## NOTE: Removed due to repeated failures
+  # vulnerability-scan:
+  #   image: quay.io/ukhomeofficedigital/anchore-submission:latest
+  #   image_name: cop-private-reporting-service:${DRONE_BUILD_NUMBER}
+  #   tolarates: medium
+  #   # An optional whitelist (comman separated list of CVE's)
+  #   # whitelist: CVE_SOMENAME_1,CVE_SOMENAME_2
+  #   # An optional whitelist file containing a list of CSV relative to the repo path
+  #   # whitelist_file: <PATH>
+  #   fail_on_detection: false
+  #   when:
+  #     event:
+  #       - push
+  #       - pull_request
 
 ## Build Public Image
   image_to_quay:
