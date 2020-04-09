@@ -13,7 +13,7 @@ RUN groupadd -r ${GROUP} && \
 
 ADD . /app/
 
-RUN npm install && npm run build
+RUN npm ci && npm run build
 
 ENV NODE_ENV='production'
 
