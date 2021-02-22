@@ -1,269 +1,270 @@
-pipeline:
-  test:
-      image: node:11
-      commands:
-        - npm ci
-        - npm run coverage
-        - npm run linter
-      when:
-        event:
-        - push
-        - pull_request
+---
+kind: pipeline
+type: kubernetes
+name: default
 
-  sonar-scanner:
-    image: quay.io/ukhomeofficedigital/sonar-scanner:v3.0.1
-    when:
-      status:
-        - failure
-        - success
-      event:
-        - push
-        - pull_request
+platform:
+  os: linux
+  arch: amd64
 
-## Image building
-  build:
-    image: quay.io/ukhomeofficedigital/drone-docker
-    commands:
-      - docker build -t cop-private-reporting-service:$${DRONE_BUILD_NUMBER} .
-    when:
-      event:
-        - push
-        - pull_request
+steps:
+- name: test
+  pull: if-not-exists
+  image: node:11
+  commands:
+  - npm ci
+  - npm run coverage
+  - npm run linter
+  when:
+    event:
+    - push
+    - pull_request
 
-## Vulnerability Scanning
-## NOTE: Removed due to repeated failures
-  # vulnerability-scan:
-  #   image: quay.io/ukhomeofficedigital/anchore-submission:latest
-  #   image_name: cop-private-reporting-service:${DRONE_BUILD_NUMBER}
-  #   tolarates: medium
-  #   # An optional whitelist (comman separated list of CVE's)
-  #   # whitelist: CVE_SOMENAME_1,CVE_SOMENAME_2
-  #   # An optional whitelist file containing a list of CSV relative to the repo path
-  #   # whitelist_file: <PATH>
-  #   fail_on_detection: false
-  #   when:
-  #     event:
-  #       - push
-  #       - pull_request
+- name: sonar-scanner
+  pull: if-not-exists
+  image: quay.io/ukhomeofficedigital/sonar-scanner:v3.0.1
+  when:
+    event:
+    - push
+    - pull_request
+    status:
+    - failure
+    - success
 
-## Build Public Image
-  image_to_quay:
-    image: quay.io/ukhomeofficedigital/drone-docker
-    secrets:
-      - DOCKER_USERNAME
-      - DOCKER_PASSWORD
+- name: build
+  pull: always
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+  commands:
+  - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+  - docker build -t cop-private-reporting-service:$${DRONE_BUILD_NUMBER} .
+  when:
+    event:
+    - push
+    - pull_request
+
+- name: image_to_quay
+  image: plugins/docker
+  settings:
     registry: quay.io
     repo: quay.io/ukhomeofficedigital/cop-private-reporting-service
     tags:
-      - ${DRONE_BUILD_NUMBER}
-      - ${DRONE_COMMIT_SHA}
-      - latest
-    when:
-      branch:
-        - master
-      event:
-        - push
+    - ${DRONE_BUILD_NUMBER}
+    - ${DRONE_COMMIT_SHA}
+    - latest
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: DOCKER_PASSWORD
+    DOCKER_USERNAME:
+      from_secret: DOCKER_USERNAME
+  when:
+    branch:
+    - master
+    event:
+    - push
 
-  deploy_to_dev:
-    image: quay.io/ukhomeofficedigital/kd
-    secrets:
-      - DEV_NAME
-      - DEV_KUBE_NAMESPACE
-      - DEV_KUBE_SERVER
-      - DEV_KUBE_TOKEN
-      - DEV_INTERNAL_CA_URL
-      - DEV_NO_LOGGING_URL_PARAMS
-      - DEV_NO_LOGGING_BODY
-      - DEV_NO_LOGGING_RESPONSE
-      - DEV_KEYCLOAK_URL
-      - DEV_KEYCLOAK_REALM
-      - DEV_KEYCLOAK_CLIENT_ID
-      - DEV_KEYCLOAK_SECRET
-      - DEV_EXT_DOMAIN
-      - DEV_PROTOCOL
-      - DEV_WHITELIST
-      - DEV_PRIVATE_UI_NAME
-      - DEV_RESOURCES_IMAGE
-      - DEV_SESSION_SECRET
-      - DEV_SESSION_NAME
-      - DEV_REDIS_URL
-      - DEV_REDIS_PORT
-      - DEV_REDIS_TOKEN
-      - DEV_PLATFORM_DATA_NAME
-      - DEV_CORS_ORIGIN
-    commands:
-      - export NAME=$${DEV_NAME}
-      - export KUBE_NAMESPACE=$${DEV_KUBE_NAMESPACE}
-      - export KUBE_SERVER=$${DEV_KUBE_SERVER}
-      - export KUBE_TOKEN=$${DEV_KUBE_TOKEN}
-      - export INTERNAL_CA_URL=$${DEV_INTERNAL_CA_URL}
-      - export NO_LOGGING_URL_PARAMS=$${DEV_NO_LOGGING_URL_PARAMS}
-      - export NO_LOGGING_BODY=$${DEV_NO_LOGGING_BODY}
-      - export NO_LOGGING_RESPONSE=$${DEV_NO_LOGGING_RESPONSE}
-      - export KEYCLOAK_URL=$${DEV_KEYCLOAK_URL}
-      - export KEYCLOAK_REALM=$${DEV_KEYCLOAK_REALM}
-      - export KEYCLOAK_SECRET=$${DEV_KEYCLOAK_SECRET}
-      - export KEYCLOAK_CLIENT_ID=$${DEV_KEYCLOAK_CLIENT_ID}
-      - export EXT_DOMAIN=$${DEV_EXT_DOMAIN}
-      - export PROTOCOL=$${DEV_PROTOCOL}
-      - export WHITELIST=$${DEV_WHITELIST}
-      - export PRIVATE_UI_NAME=$${DEV_PRIVATE_UI_NAME}
-      - export RESOURCES_IMAGE=$${DEV_RESOURCES_IMAGE}
-      - export SESSION_SECRET=$${DEV_SESSION_SECRET}
-      - export SESSION_NAME=$${DEV_SESSION_NAME}
-      - export REDIS_URL=$${DEV_REDIS_URL}
-      - export REDIS_PORT=$${DEV_REDIS_PORT}
-      - export REDIS_TOKEN=$${DEV_REDIS_TOKEN}
-      - export PLATFORM_DATA_NAME=$${DEV_PLATFORM_DATA_NAME}
-      - export CORS_ORIGIN=$${DEV_CORS_ORIGIN}
-      - export IMAGE_TAG=$${DRONE_BUILD_NUMBER}
-      - kd --insecure-skip-tls-verify -f kube/network-policy.yml
-      - kd --insecure-skip-tls-verify -f kube/secret.yml
-      - kd --insecure-skip-tls-verify -f kube/service.yml
-      - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
-      - kd --insecure-skip-tls-verify -f kube/ingress.yml
-    when:
-      branch:
-        - master
-      event:
-        - push
+- name: deploy_to_dev
+  pull: if-not-exists
+  image: quay.io/ukhomeofficedigital/kd
+  commands:
+  - export NAME=$${DEV_NAME}
+  - export KUBE_NAMESPACE=$${DEV_KUBE_NAMESPACE}
+  - export KUBE_SERVER=$${DEV_KUBE_SERVER}
+  - export KUBE_TOKEN=$${DEV_KUBE_TOKEN}
+  - export INTERNAL_CA_URL=$${DEV_INTERNAL_CA_URL}
+  - export NO_LOGGING_URL_PARAMS=$${DEV_NO_LOGGING_URL_PARAMS}
+  - export NO_LOGGING_BODY=$${DEV_NO_LOGGING_BODY}
+  - export NO_LOGGING_RESPONSE=$${DEV_NO_LOGGING_RESPONSE}
+  - export KEYCLOAK_URL=$${DEV_KEYCLOAK_URL}
+  - export KEYCLOAK_REALM=$${DEV_KEYCLOAK_REALM}
+  - export KEYCLOAK_SECRET=$${DEV_KEYCLOAK_SECRET}
+  - export KEYCLOAK_CLIENT_ID=$${DEV_KEYCLOAK_CLIENT_ID}
+  - export EXT_DOMAIN=$${DEV_EXT_DOMAIN}
+  - export PROTOCOL=$${DEV_PROTOCOL}
+  - export WHITELIST=$${DEV_WHITELIST}
+  - export PRIVATE_UI_NAME=$${DEV_PRIVATE_UI_NAME}
+  - export RESOURCES_IMAGE=$${DEV_RESOURCES_IMAGE}
+  - export SESSION_SECRET=$${DEV_SESSION_SECRET}
+  - export SESSION_NAME=$${DEV_SESSION_NAME}
+  - export REDIS_URL=$${DEV_REDIS_URL}
+  - export REDIS_PORT=$${DEV_REDIS_PORT}
+  - export REDIS_TOKEN=$${DEV_REDIS_TOKEN}
+  - export PLATFORM_DATA_NAME=$${DEV_PLATFORM_DATA_NAME}
+  - export CORS_ORIGIN=$${DEV_CORS_ORIGIN}
+  - export IMAGE_TAG=$${DRONE_BUILD_NUMBER}
+  - kd --insecure-skip-tls-verify -f kube/network-policy.yml
+  - kd --insecure-skip-tls-verify -f kube/secret.yml
+  - kd --insecure-skip-tls-verify -f kube/service.yml
+  - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
+  - kd --insecure-skip-tls-verify -f kube/ingress.yml
+  environment:
+    DEV_CORS_ORIGIN:
+      from_secret: DEV_CORS_ORIGIN
+    DEV_EXT_DOMAIN:
+      from_secret: DEV_EXT_DOMAIN
+    DEV_INTERNAL_CA_URL:
+      from_secret: DEV_INTERNAL_CA_URL
+    DEV_KEYCLOAK_CLIENT_ID:
+      from_secret: DEV_KEYCLOAK_CLIENT_ID
+    DEV_KEYCLOAK_REALM:
+      from_secret: DEV_KEYCLOAK_REALM
+    DEV_KEYCLOAK_SECRET:
+      from_secret: DEV_KEYCLOAK_SECRET
+    DEV_KEYCLOAK_URL:
+      from_secret: DEV_KEYCLOAK_URL
+    DEV_KUBE_NAMESPACE:
+      from_secret: DEV_KUBE_NAMESPACE
+    DEV_KUBE_SERVER:
+      from_secret: DEV_KUBE_SERVER
+    DEV_KUBE_TOKEN:
+      from_secret: DEV_KUBE_TOKEN
+    DEV_NAME:
+      from_secret: DEV_NAME
+    DEV_NO_LOGGING_BODY:
+      from_secret: DEV_NO_LOGGING_BODY
+    DEV_NO_LOGGING_RESPONSE:
+      from_secret: DEV_NO_LOGGING_RESPONSE
+    DEV_NO_LOGGING_URL_PARAMS:
+      from_secret: DEV_NO_LOGGING_URL_PARAMS
+    DEV_PLATFORM_DATA_NAME:
+      from_secret: DEV_PLATFORM_DATA_NAME
+    DEV_PRIVATE_UI_NAME:
+      from_secret: DEV_PRIVATE_UI_NAME
+    DEV_PROTOCOL:
+      from_secret: DEV_PROTOCOL
+    DEV_REDIS_PORT:
+      from_secret: DEV_REDIS_PORT
+    DEV_REDIS_TOKEN:
+      from_secret: DEV_REDIS_TOKEN
+    DEV_REDIS_URL:
+      from_secret: DEV_REDIS_URL
+    DEV_RESOURCES_IMAGE:
+      from_secret: DEV_RESOURCES_IMAGE
+    DEV_SESSION_NAME:
+      from_secret: DEV_SESSION_NAME
+    DEV_SESSION_SECRET:
+      from_secret: DEV_SESSION_SECRET
+    DEV_WHITELIST:
+      from_secret: DEV_WHITELIST
+  when:
+    branch:
+    - master
+    event:
+    - push
 
-#  deploy_to_test:
-#    image: quay.io/ukhomeofficedigital/kd
-#    secrets:
-#      - TEST_NAME
-#      - TEST_KUBE_NAMESPACE
-#      - TEST_KUBE_SERVER
-#      - TEST_KUBE_TOKEN
-#      - TEST_INTERNAL_CA_URL
-#      - TEST_NO_LOGGING_URL_PARAMS
-#      - TEST_NO_LOGGING_BODY
-#      - TEST_NO_LOGGING_RESPONSE
-#      - TEST_KEYCLOAK_URL
-#      - TEST_KEYCLOAK_REALM
-#      - TEST_KEYCLOAK_SECRET
-#      - TEST_EXT_DOMAIN
-#      - TEST_PROTOCOL
-#      - TEST_WHITELIST
-#      - TEST_PRIVATE_UI_NAME
-#      - TEST_RESOURCES_IMAGE
-#      - TEST_SESSION_SECRET
-#      - TEST_SESSION_NAME
-#      - TEST_REDIS_URL
-#      - TEST_REDIS_PORT
-#      - TEST_REDIS_TOKEN
-#      - TEST_PLATFORM_DATA_NAME
-#    commands:
-#      - export NAME=$${TEST_NAME}
-#      - export KUBE_NAMESPACE=$${TEST_KUBE_NAMESPACE}
-#      - export KUBE_SERVER=$${TEST_KUBE_SERVER}
-#      - export KUBE_TOKEN=$${TEST_KUBE_TOKEN}
-#      - export INTERNAL_CA_URL=$${TEST_INTERNAL_CA_URL}
-#      - export NO_LOGGING_URL_PARAMS=$${TEST_NO_LOGGING_URL_PARAMS}
-#      - export NO_LOGGING_BODY=$${TEST_NO_LOGGING_BODY}
-#      - export NO_LOGGING_RESPONSE=$${TEST_NO_LOGGING_RESPONSE}
-#      - export KEYCLOAK_URL=$${TEST_KEYCLOAK_URL}
-#      - export KEYCLOAK_REALM=$${TEST_KEYCLOAK_REALM}
-#      - export KEYCLOAK_SECRET=$${TEST_KEYCLOAK_SECRET}
-#      - export EXT_DOMAIN=$${TEST_EXT_DOMAIN}
-#      - export PROTOCOL=$${TEST_PROTOCOL}
-#      - export WHITELIST=$${TEST_WHITELIST}
-#      - export PRIVATE_UI_NAME=$${TEST_PRIVATE_UI_NAME}
-#      - export RESOURCES_IMAGE=$${TEST_RESOURCES_IMAGE}
-#      - export SESSION_SECRET=$${TEST_SESSION_SECRET}
-#      - export SESSION_NAME=$${TEST_SESSION_NAME}
-#      - export REDIS_URL=$${TEST_REDIS_URL}
-#      - export REDIS_PORT=$${TEST_REDIS_PORT}
-#      - export REDIS_TOKEN=$${TEST_REDIS_TOKEN}
-#      - export PLATFORM_DATA_NAME=$${TEST_PLATFORM_DATA_NAME}
-#      - export IMAGE_TAG=$${DRONE_BUILD_NUMBER}
-#      - kd --insecure-skip-tls-verify -f kube/network-policy.yml
-#      - kd --insecure-skip-tls-verify -f kube/secret.yml
-#      - kd --insecure-skip-tls-verify -f kube/service.yml
-#      - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
-#      - kd --insecure-skip-tls-verify -f kube/ingress.yml
-#    when:
-#      branch:
-#        - master
-#      event:
-#        - push
+- name: deploy_to_demo
+  pull: if-not-exists
+  image: quay.io/ukhomeofficedigital/kd
+  commands:
+  - export NAME=$${DEMO_NAME}
+  - export KUBE_NAMESPACE=$${DEMO_KUBE_NAMESPACE}
+  - export KUBE_SERVER=$${DEMO_KUBE_SERVER}
+  - export KUBE_TOKEN=$${DEMO_KUBE_TOKEN}
+  - export INTERNAL_CA_URL=$${DEMO_INTERNAL_CA_URL}
+  - export NO_LOGGING_URL_PARAMS=$${DEMO_NO_LOGGING_URL_PARAMS}
+  - export NO_LOGGING_BODY=$${DEMO_NO_LOGGING_BODY}
+  - export NO_LOGGING_RESPONSE=$${DEMO_NO_LOGGING_RESPONSE}
+  - export KEYCLOAK_URL=$${DEMO_KEYCLOAK_URL}
+  - export KEYCLOAK_REALM=$${DEMO_KEYCLOAK_REALM}
+  - export KEYCLOAK_SECRET=$${DEMO_KEYCLOAK_SECRET}
+  - export EXT_DOMAIN=$${DEMO_EXT_DOMAIN}
+  - export PROTOCOL=$${DEMO_PROTOCOL}
+  - export WHITELIST=$${DEMO_WHITELIST}
+  - export PRIVATE_UI_NAME=$${DEMO_PRIVATE_UI_NAME}
+  - export RESOURCES_IMAGE=$${DEMO_RESOURCES_IMAGE}
+  - export SESSION_SECRET=$${DEMO_SESSION_SECRET}
+  - export SESSION_NAME=$${DEMO_SESSION_NAME}
+  - export REDIS_URL=$${DEMO_REDIS_URL}
+  - export REDIS_PORT=$${DEMO_REDIS_PORT}
+  - export REDIS_TOKEN=$${DEMO_REDIS_TOKEN}
+  - export PLATFORM_DATA_NAME=$${DEMO_PLATFORM_DATA_NAME}
+  - export CORS_ORIGIN=$${DEMO_CORS_ORIGIN}
+  - export IMAGE_TAG=$${IMAGE_TAG}
+  - kd --insecure-skip-tls-verify -f kube/network-policy.yml
+  - kd --insecure-skip-tls-verify -f kube/secret.yml
+  - kd --insecure-skip-tls-verify -f kube/service.yml
+  - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
+  - kd --insecure-skip-tls-verify -f kube/ingress.yml
+  environment:
+    DEMO_CORS_ORIGIN:
+      from_secret: DEMO_CORS_ORIGIN
+    DEMO_EXT_DOMAIN:
+      from_secret: DEMO_EXT_DOMAIN
+    DEMO_INTERNAL_CA_URL:
+      from_secret: DEMO_INTERNAL_CA_URL
+    DEMO_KEYCLOAK_REALM:
+      from_secret: DEMO_KEYCLOAK_REALM
+    DEMO_KEYCLOAK_SECRET:
+      from_secret: DEMO_KEYCLOAK_SECRET
+    DEMO_KEYCLOAK_URL:
+      from_secret: DEMO_KEYCLOAK_URL
+    DEMO_KUBE_NAMESPACE:
+      from_secret: DEMO_KUBE_NAMESPACE
+    DEMO_KUBE_SERVER:
+      from_secret: DEMO_KUBE_SERVER
+    DEMO_KUBE_TOKEN:
+      from_secret: DEMO_KUBE_TOKEN
+    DEMO_NAME:
+      from_secret: DEMO_NAME
+    DEMO_NO_LOGGING_BODY:
+      from_secret: DEMO_NO_LOGGING_BODY
+    DEMO_NO_LOGGING_RESPONSE:
+      from_secret: DEMO_NO_LOGGING_RESPONSE
+    DEMO_NO_LOGGING_URL_PARAMS:
+      from_secret: DEMO_NO_LOGGING_URL_PARAMS
+    DEMO_PLATFORM_DATA_NAME:
+      from_secret: DEMO_PLATFORM_DATA_NAME
+    DEMO_PRIVATE_UI_NAME:
+      from_secret: DEMO_PRIVATE_UI_NAME
+    DEMO_PROTOCOL:
+      from_secret: DEMO_PROTOCOL
+    DEMO_REDIS_PORT:
+      from_secret: DEMO_REDIS_PORT
+    DEMO_REDIS_TOKEN:
+      from_secret: DEMO_REDIS_TOKEN
+    DEMO_REDIS_URL:
+      from_secret: DEMO_REDIS_URL
+    DEMO_RESOURCES_IMAGE:
+      from_secret: DEMO_RESOURCES_IMAGE
+    DEMO_SESSION_NAME:
+      from_secret: DEMO_SESSION_NAME
+    DEMO_SESSION_SECRET:
+      from_secret: DEMO_SESSION_SECRET
+    DEMO_WHITELIST:
+      from_secret: DEMO_WHITELIST
+  when:
+    event:
+    - promote
+    target:
+    - demo
 
-  deploy_to_demo:
-    image: quay.io/ukhomeofficedigital/kd
-    secrets:
-      - DEMO_NAME
-      - DEMO_KUBE_NAMESPACE
-      - DEMO_KUBE_SERVER
-      - DEMO_KUBE_TOKEN
-      - DEMO_INTERNAL_CA_URL
-      - DEMO_NO_LOGGING_URL_PARAMS
-      - DEMO_NO_LOGGING_BODY
-      - DEMO_NO_LOGGING_RESPONSE
-      - DEMO_KEYCLOAK_URL
-      - DEMO_KEYCLOAK_REALM
-      - DEMO_KEYCLOAK_SECRET
-      - DEMO_EXT_DOMAIN
-      - DEMO_PROTOCOL
-      - DEMO_WHITELIST
-      - DEMO_PRIVATE_UI_NAME
-      - DEMO_RESOURCES_IMAGE
-      - DEMO_SESSION_SECRET
-      - DEMO_SESSION_NAME
-      - DEMO_REDIS_URL
-      - DEMO_REDIS_PORT
-      - DEMO_REDIS_TOKEN
-      - DEMO_PLATFORM_DATA_NAME
-      - DEMO_CORS_ORIGIN
-    commands:
-      - export NAME=$${DEMO_NAME}
-      - export KUBE_NAMESPACE=$${DEMO_KUBE_NAMESPACE}
-      - export KUBE_SERVER=$${DEMO_KUBE_SERVER}
-      - export KUBE_TOKEN=$${DEMO_KUBE_TOKEN}
-      - export INTERNAL_CA_URL=$${DEMO_INTERNAL_CA_URL}
-      - export NO_LOGGING_URL_PARAMS=$${DEMO_NO_LOGGING_URL_PARAMS}
-      - export NO_LOGGING_BODY=$${DEMO_NO_LOGGING_BODY}
-      - export NO_LOGGING_RESPONSE=$${DEMO_NO_LOGGING_RESPONSE}
-      - export KEYCLOAK_URL=$${DEMO_KEYCLOAK_URL}
-      - export KEYCLOAK_REALM=$${DEMO_KEYCLOAK_REALM}
-      - export KEYCLOAK_SECRET=$${DEMO_KEYCLOAK_SECRET}
-      - export EXT_DOMAIN=$${DEMO_EXT_DOMAIN}
-      - export PROTOCOL=$${DEMO_PROTOCOL}
-      - export WHITELIST=$${DEMO_WHITELIST}
-      - export PRIVATE_UI_NAME=$${DEMO_PRIVATE_UI_NAME}
-      - export RESOURCES_IMAGE=$${DEMO_RESOURCES_IMAGE}
-      - export SESSION_SECRET=$${DEMO_SESSION_SECRET}
-      - export SESSION_NAME=$${DEMO_SESSION_NAME}
-      - export REDIS_URL=$${DEMO_REDIS_URL}
-      - export REDIS_PORT=$${DEMO_REDIS_PORT}
-      - export REDIS_TOKEN=$${DEMO_REDIS_TOKEN}
-      - export PLATFORM_DATA_NAME=$${DEMO_PLATFORM_DATA_NAME}
-      - export CORS_ORIGIN=$${DEMO_CORS_ORIGIN}
-      - export IMAGE_TAG=$${IMAGE_TAG}
-      - kd --insecure-skip-tls-verify -f kube/network-policy.yml
-      - kd --insecure-skip-tls-verify -f kube/secret.yml
-      - kd --insecure-skip-tls-verify -f kube/service.yml
-      - kd --insecure-skip-tls-verify -f kube/deployment.yml --timeout=5m
-      - kd --insecure-skip-tls-verify -f kube/ingress.yml
-    when:
-      environment:
-        - demo
-      event:
-        - deployment
-
-  notify:
-    image: plugins/slack
-    secrets: [ SLACK_WEBHOOK ]
+- name: notify
+  pull: if-not-exists
+  image: plugins/slack
+  settings:
     channel: cop-deployments
+    template: "{{#build.deployTo}}\n  *{{repo.name}} - Build {{build.number}} - {{uppercasefirst build.deployTo}} - {{uppercase build.status}}*\n  {{build.link}}\n{{else}}\n  *{{repo.name}} - Build {{build.number}} - Development - {{uppercase build.status}}*\n  {{build.link}}\n{{/build.deployTo}}\n"
     username: Drone Build Watcher
-    template: >
-      {{#build.deployTo}}
-        *{{repo.name}} - Build {{build.number}} - {{uppercasefirst build.deployTo}} - {{uppercase build.status}}*
-        {{build.link}}
-      {{else}}
-        *{{repo.name}} - Build {{build.number}} - Development - {{uppercase build.status}}*
-        {{build.link}}
-      {{/build.deployTo}}
-    when:
-      branch: master
-      event: [ push, deployment ]
-      status: [ success, failure ]
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: SLACK_WEBHOOK
+  when:
+    branch:
+    - master
+    event:
+    - push
+    - promote
+    status:
+    - success
+    - failure
+
+services:
+- name: docker
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+
+- name: anchore-submission-server
+  pull: always
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/anchore-submission:latest
+  commands:
+  - /run.sh server
+
+...
